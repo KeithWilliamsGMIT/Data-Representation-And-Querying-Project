@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+<!-- Change the title text in the layout.html -->
+{% block title %}Search{% endblock %}
+
+<!-- Insert body html into layout.html -->
+{% block body %}
+
+<!-- Search bar adapted from http://bootsnipp.com/snippets/featured/custom-search-input -->
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <form id="custom-search-input" class="input-group">
+            <input type="text" class="form-control" placeholder="Search" />
+
+            <span class="input-group-btn">
+                <button class="btn" type="submit">
+                    <i class="glyphicon glyphicon-search"></i>
+                </button>
+            </span>
+        </form>
+    </div>
+</div>
+
+<!-- Display results -->
+<div class="row-fluid margin-top-10">
+    <div class="col-sm-4">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>Profile description</p>
+                
+                <form>
+                    <input class="btn btn-success btn-block" type="submit" value="Follow"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
