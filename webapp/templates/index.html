@@ -1,10 +1,11 @@
 <!DOCTYPE HTML>
 
-<html lang="en">
+<html lang="en" ng-app="app">
     <head>
-        <title>{% block title %}{% endblock %}</title>
-
+        <title ng-bind="title">myApp</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <meta charset="utf-8">
+        <base href="/">
     </head>
 
     <body>
@@ -25,34 +26,43 @@
                 
                 <!-- Collapse this section of the navbar on small screens -->
                 <div id="navbar-collapse" class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav navbar-right">
-
-                        <li class="active"><a href="feed">Feed</a></li>
-                        <li><a href="search">Search</a></li>
+                    <!-- Add the auto-active-link directive -->
+                    <ul class="nav navbar-nav navbar-right" auto-active-link>
+                        <li><a href="/feed">Feed</a></li>
+                        <li><a href="/search">Search</a></li>
 
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="profile">Profile</a></li>
+                                <li><a href="/profile">Profile</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li><a href="login">Logout</a></li>
+                                <li><a href="/login">Logout</a></li>
                             </ul>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
-
-        <div class="container">
-           {% block body %}{% endblock %}
-        </div>
+        
+        <!-- The partials will be displayed inside this div tag -->
+        <div ng-view class="container"></div>
         
         <!-- Include external files at the end of the body and include the css files first to make the load time appear quicker -->
         <!-- Bootstrap CSS CDN -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
         <!-- style.css file -->
-        <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static', filename='css/style.css') }}">
+        <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+        
+        <!-- AngularJS CDN -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.min.js"></script>
+        
+        <!-- JS Files -->
+        <script src="/static/js/app.js"></script>
+        <script src="/static/js/directives.js"></script>
+        <script src="/static/js/controllers.js"></script>
+        <script src="/static/js/services.js"></script>
         
         <!-- JQuery CDN -->
         <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>

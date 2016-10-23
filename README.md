@@ -16,9 +16,9 @@ The following is a list of goals I've outlined for this project.
 After considering the above goals I chose to develop a webapp similar to Twitter.
 
 ##### MVP
-The MVP will only contain features vital to any social network. It should have a user friendly layout and should also be designed so that additional features will be easy to integrate. With this in mind I decided that the MVP should have four views.
+The MVP will only contain features vital to any social network. It should have a user friendly layout and should also be designed so that additional features will be easy to integrate. With this in mind I decided that the MVP should have five views.
 
-1. Sign in and login view
+1. Sign up and login views
    - The sign up and login will be very basic. There will be no email confirmation, forgot/reset password option or "remember me" option.
 2. Feeds view
    - The feed view will allow users to write posts, but they can only be plain text, and to read other peoples posts.
@@ -34,4 +34,10 @@ The following are some of the features I'd like to add once the MVP is complete.
 + Allow users to post images and videos
 + Recommend people to follow
 + Add a direct messaging system
-+ Sign in and login options ommitted from MVP
++ Sign up and login options ommitted from MVP
+
+#### Development Stage
+Technologies used:
++ Python and Flask
++ Bootstrap
++ AngularJS
