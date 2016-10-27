@@ -38,6 +38,58 @@ The following are some of the features I'd like to add once the MVP is complete.
 
 #### Development Stage
 Technologies used:
-+ Python and Flask
++ Python3 and Flask
 + Bootstrap
 + AngularJS
++ Neo4J
+
+#### Deployment Stage
+
+##### Setting up Neo4J locally
+This webapp requires Neo4J. After you download and start Neo4J set the username and password variables as follows.
+```
+export NEO4J_USERNAME=username
+export NEO4J_PASSWORD=password
+```
+
+The default username/password is neo4j/neo4j. To check if they are set correctly use the following commands.
+```
+echo $NEO4J_USERNAME
+echo $NEO4J_PASSWORD
+```
+
+Alternatively, you can disable athentication by uncommenting the following line in the neo4j.config file.
+```
+dbms.security.auth_enabled=false
+```
+
+##### Running the webapp
+Clone the repository
+```
+git clone https://github.com/KeithWilliamsGMIT/Data-Representation-And-Querying-Project.git
+cd Data-Representation-And-Querying-Project
+```
+
+Install virtualenv if you don't already have it installed
+```
+pip install virtualenv
+```
+
+Create and activate a virtual environment called venv
+```
+virtualenv venv
+source venv/bin/activate
+```
+
+Install the requirements
+```
+pip install -r requirements.txt
+```
+
+Run the webapp
+```
+cd webapp
+python webapp.py
+```
+
+Open http://localhost:5000 with your web browser.

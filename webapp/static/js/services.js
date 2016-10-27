@@ -1,5 +1,1 @@
-angular.module ('app.services', [])
-
-.factory('posts', function() {
-    
-});
+angular.module ('app.services', []);
