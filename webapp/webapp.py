@@ -1,5 +1,6 @@
 from flask import Flask, make_response, request, session
 from models import User
+import json
 import os
 app = Flask(__name__)
 
@@ -19,8 +20,8 @@ def index():
     # make_response does not cache the page
     return make_response(open("templates/index.html").read())
 
-@app.route("/register_user", methods=["POST"])
-def register_user():
+@app.route("/register", methods=["POST"])
+def register():
     data = request.get_json()
     name = data["name"]
     email = data["email"]
@@ -28,18 +29,33 @@ def register_user():
     re_enter_password = data["reEnterPassword"]
 
     if len(name) < 1:
-        return "Your name must be at least one character."
+        return json.dumps({"status": "error", "message": "Your name must be at least one character."})
     elif len(password) < 8:
-        return "Your password must be at least 8 characters."
+        return json.dumps({"status": "error", "message": "Your password must be at least 8 characters."})
     elif password != re_enter_password:
-        return "The passwords you entered did not match."
-    elif not User(name, email).register(password):
-        return "That email address was already registered."
+        return json.dumps({"status": "error", "message": "The passwords you entered did not match."})
+    elif not User(email).register(name, password):
+        return json.dumps({"status": "error", "message": "That email address was already registered."})
     else:
-        session["name"] = name
-        return session.get("name")
-    
-    json.dumps(return_value)
+        session["email"] = email
+        return json.dumps({"status": "success", "message": "User successfully registered.", "user": {"email": email}})
+
+@app.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    email = data["email"]
+    password = data["password"]
+
+    if not User(email).verify_password(password):
+        return json.dumps({"status": "error", "message": "Invalid login."})
+    else:
+        session["email"] = email
+        return json.dumps({"status": "success", "message": "User successfully logged in.", "user": {"email": email}})
+
+@app.route("/logout" , methods=["GET"])
+def logout():
+    session.pop("email", None)
+    return json.dumps({"status": "success", "message": "User successfully logged out."})
 
 if __name__ == "__main__":
     app.run(debug=DEBUG_MODE)

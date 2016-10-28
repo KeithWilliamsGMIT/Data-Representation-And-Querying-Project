@@ -1,32 +1,26 @@
-angular.module ('app.controllers', [])
+angular.module ("app.controllers", [])
 
-.controller('signUpCtrl', function($scope, User) {
-    var signUpData = {
-        name: "",
-        email: "",
-        password: "",
-        reEnterPassword: ""
-    }
-    
-    $scope.signUp = function() {
-        User.register(signUpData);
-    }
-    
-    $scope.signUpData = signUpData;
+.controller("headerCtrl", function($scope, User) {
+    $scope.logout = User.logout;
+    $scope.isLoggedIn = User.isLoggedIn;
 })
 
-.controller('loginCtrl', function() {
-    
+.controller("signUpCtrl", function($scope, User) {
+    $scope.signUp = User.register;
 })
 
-.controller('feedCtrl', function() {
+.controller("loginCtrl", function($scope, User) {
+    $scope.login = User.login;
+})
+
+.controller("feedCtrl", function() {
     
 })
 
-.controller('profileCtrl', function() {
+.controller("profileCtrl", function() {
     
 })
 
-.controller('searchCtrl', function() {
+.controller("searchCtrl", function() {
     
 });

@@ -11,10 +11,9 @@ graph = Graph(url + '/db/data/', username=username, password=password)
 
 class User:
     # __init__ is called when the object user is created
-    def __init__(self, name, email):
+    def __init__(self, email):
         # self is reference to this instance of an object
-        # assign values to the variables name and email in the new object
-        self.name = name
+        # assign values to the variable email in the new object
         self.email = email
     
     # Find the user in the graph using their email address
@@ -23,9 +22,9 @@ class User:
         return user
     
     # Register a new user if they don't already exist
-    def register(self, password):
+    def register(self, name, password):
         if not self.find():
-            user = Node('User', name=self.name, email=self.email, password=bcrypt.encrypt(password))
+            user = Node('User', name=name, email=self.email, password=bcrypt.encrypt(password))
             graph.create(user)
             return True
         else:

@@ -10,24 +10,29 @@
 
     <body>
         <!-- Navbar adapted from https://getbootstrap.com/components/#navbar -->
-        <nav class="navbar navbar-default navbar-static-top" role="navigation">
+        <!-- Add ng-clock to the menu to hide it until the page has loaded to avoid the flicker for logged out users -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" ng-controller="headerCtrl">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <!-- Toggle button for the collapsed section of the navbar -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
+                    <!-- Wrap the toggle button in a div so it can be hidden to users that are not logged in -->
+                    <div ng-show="isLoggedIn()" ng-cloak>
+                        <!-- Toggle button for the collapsed section of the navbar -->
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
                     
                     <a class="navbar-brand" href="#">Name</a>
                 </div>
                 
                 <!-- Collapse this section of the navbar on small screens -->
                 <div id="navbar-collapse" class="collapse navbar-collapse">
-                    <!-- Add the auto-active-link directive -->
-                    <ul class="nav navbar-nav navbar-right" auto-active-link>
+                    <!-- Only show the menu to users that are logged in -->
+                    <!-- Add the auto-active-link directive to the menu to highlight the menu button that links to the current page -->
+                    <ul class="nav navbar-nav navbar-right" auto-active-link ng-show="isLoggedIn()" ng-cloak>
                         <li><a href="/feed">Feed</a></li>
                         <li><a href="/search">Search</a></li>
 
@@ -36,7 +41,7 @@
                             <ul class="dropdown-menu">
                                 <li><a href="/profile">Profile</a></li>
                                 <li role="separator" class="divider"></li>
-                                <li><a href="/login">Logout</a></li>
+                                <li><a ng-click="logout()">Logout</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -55,7 +60,7 @@
         <link rel="stylesheet" type="text/css" href="/static/css/style.css">
         
         <!-- AngularJS CDN -->
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.min.js"></script>
         
         <!-- JS Files -->
