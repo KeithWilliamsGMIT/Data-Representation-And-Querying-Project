@@ -33,3 +33,8 @@
 
 /* Row spacing */
 .margin-top-10 { margin-top: 1.0em; }
+
+/* Textarea without resize */
+#post-area {
+    resize: none;
+}

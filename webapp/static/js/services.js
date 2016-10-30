@@ -1,8 +1,9 @@
 angular.module ("app.services", [])
 
-.factory("User", function($http, $location) {
+.factory("User", function($http, $location, Message) {
     var userData = {}
     
+    // Send an AJAX request to the server to register a new user
     function register(data) {
         $http.post("/register", data)
         
@@ -15,7 +16,8 @@ angular.module ("app.services", [])
                     userData = response.data.user;
                     $location.path("/feed");
                 } else {
-                    console.log("Error Message: " + response.data.message);
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
                 }
             },
 
@@ -25,6 +27,7 @@ angular.module ("app.services", [])
         );
     }
     
+    // Send an AJAX request to the server to login
     function login(data) {
         $http.post("/login", data)
         
@@ -37,7 +40,8 @@ angular.module ("app.services", [])
                     userData = response.data.user;
                     $location.path("/feed");
                 } else {
-                    console.log("Error Message: " + response.data.message);
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
                 }
             },
 
@@ -47,6 +51,7 @@ angular.module ("app.services", [])
         );
     }
     
+    // Send an AJAX request to the server to logout
     function logout() {
         $http.get("/logout")
         
@@ -82,5 +87,38 @@ angular.module ("app.services", [])
         logout: logout,
         isLoggedIn: isLoggedIn,
         getUserData: getUserData
+    }
+})
+
+.factory("Message", function() {
+    var data = {
+        message: null
+    }
+    
+    function getMessage() {
+        return data.message;
+    }
+    
+    function setMessage(message) {
+        data = {
+            message: message
+        };
+    }
+    
+    // Return true if there is a message
+    function hasMessage() {
+        return data.message && data.message.length > 0;
+    }
+    
+    // Clear the message
+    function clearMessage() {
+        data.message = null;
+    }
+    
+    return {
+        getMessage: getMessage,
+        setMessage: setMessage,
+        hasMessage: hasMessage,
+        clearMessage: clearMessage
     }
 });
