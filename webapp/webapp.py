@@ -57,5 +57,21 @@ def logout():
     session.pop("email", None)
     return json.dumps({"status": "success", "message": "User successfully logged out."})
 
+@app.route('/add_post', methods=['POST'])
+def add_post():
+    data = request.get_json()
+    text = data["text"]
+
+    if not text:
+        return json.dumps({"status": "error", "message": "The post was empty."})
+    else:
+        User(session["email"]).add_post(text)
+        return json.dumps({"status": "success", "message": "Successfully added post."})
+
+@app.route('/get_posts', methods=['GET'])
+def get_posts():
+    posts = User(session["email"]).get_posts()
+    return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
+
 if __name__ == "__main__":
     app.run(debug=DEBUG_MODE)

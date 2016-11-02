@@ -17,8 +17,11 @@ angular.module ("app.controllers", [])
     $scope.hasMessage = Message.hasMessage;
 })
 
-.controller("feedCtrl", function() {
-    
+.controller("feedCtrl", function($scope, Feed, Message) {
+    $scope.addPost = Feed.addPost;
+    $scope.getFeed = Feed.getFeed;
+    $scope.getMessage = Message.getMessage;
+    $scope.hasMessage = Message.hasMessage;
 })
 
 .controller("profileCtrl", function() {

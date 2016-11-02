@@ -37,3 +37,21 @@ class User:
             return bcrypt.verify(password, user['password'])
         else:
             return False
+    
+    # Add the post to the database
+    def add_post(self, text):
+        user = self.find()
+        post = Node('Post', text=text)
+        rel = Relationship(user, 'POSTED', post)
+        graph.create(rel)
+    
+    # Return all posts written by the current user
+    def get_posts(self):
+        query = '''
+        MATCH (user:User)-[:POSTED]->(post:Post)
+        WHERE user.email = {email}
+        RETURN post
+        '''
+        
+        # Return a list of dictionaries which can be converted to JSON
+        return graph.data(query, email=self.email)

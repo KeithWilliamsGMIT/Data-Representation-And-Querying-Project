@@ -37,11 +37,26 @@ The following are some of the features I'd like to add once the MVP is complete.
 + Sign up and login options ommitted from MVP
 
 #### Development Stage
-Technologies used:
-+ Python3 and Flask
-+ Bootstrap
-+ AngularJS
-+ Neo4J
+
+##### Technologies used
+
+###### Client Side
+- AngularJS
+
+The AngularJS framework was used to handle the routing on the client side and because it allowed the JavaScript to be written in a structured way, using the MVC pattern.
+
+- Bootstrap
+
+Bootstrap allowed me to focus on developing the functionality of the webapp rather than the responsiveness or cross browser compatability which ultimately sped up development.
+
+###### Server Side
+- Python3 and Flask
+
+Python3 and the Flask microframework were requirements for this project.
+
+- Neo4J
+
+A graph database seemed like the obvious choice of database for a social network as the data is not linear by nature.
 
 #### Deployment Stage
 
@@ -63,7 +78,9 @@ Alternatively, you can disable athentication by uncommenting the following line 
 dbms.security.auth_enabled=false
 ```
 
-##### Running the webapp
+Open [http://localhost:7474](http://localhost:7474) with your web browser to use the Neo4J GUI.
+
+##### Running the webapp locally
 Clone the repository
 ```
 git clone https://github.com/KeithWilliamsGMIT/Data-Representation-And-Querying-Project.git
@@ -92,4 +109,4 @@ cd webapp
 python webapp.py
 ```
 
-Open http://localhost:5000 with your web browser.
+Open [http://localhost:5000](http://localhost:5000) with your web browser.

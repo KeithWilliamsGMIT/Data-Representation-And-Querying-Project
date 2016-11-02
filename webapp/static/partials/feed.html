@@ -1,9 +1,14 @@
 <!-- Textbox for writing posts -->
 <div class="panel panel-default">
     <div class="panel-body">
-        <form>
+        <!-- Show messages here -->
+        <div class="alert alert-danger" role="alert" ng-show="hasMessage()">
+            <span ng-bind="getMessage()"></span>
+        </div>
+        
+        <form ng-submit="addPost(post)">
             <div class="form-group">
-                <textarea id="post-area" class="form-control" rows="1" cols="40" placeholder="Write your post here" onfocus="this.rows=3" onblur="this.rows=1" required></textarea>
+                <textarea id="post-area" class="form-control" rows="1" cols="40" placeholder="Write your post here" onfocus="this.rows=3" onsubmit="this.rows=1" ng-model="post.text" required></textarea>
             </div>
             
             <input class="btn btn-success btn-block" type="submit" value="Post">
@@ -12,8 +17,10 @@
 </div>
 
 <!-- Display posts here -->
-<div class="panel panel-default">
-    <div class="panel-body">
-        <p>This is a post in the feed.</p>
+<div ng-repeat="post in getFeed()">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p>{{post.post.text}}</p>
+        </div>
     </div>
 </div>
