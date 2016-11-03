@@ -1,7 +1,7 @@
 <div class="row">
     <div class="col-md-offset-2 col-md-8">
-        <form id="custom-search-input" class="input-group">
-            <input type="text" class="form-control" placeholder="Search" />
+        <form id="custom-search-input" class="input-group" ng-submit="searchUsers(search)">
+            <input type="text" class="form-control" placeholder="Search" ng-model="search.query" required/>
 
             <span class="input-group-btn">
                 <button class="btn" type="submit">
@@ -13,11 +13,12 @@
 </div>
 
 <!-- Display results -->
-<div class="row-fluid margin-top-10">
+<div class="row-fluid margin-top-10" ng-repeat="user in getUsers()">
     <div class="col-sm-4">
         <div class="panel panel-default">
             <div class="panel-body">
-                <p>Profile description</p>
+                <h4 ng-bind="user.name"></h4>
+                <h5 ng-bind="user.email"></h5>
                 
                 <form>
                     <input class="btn btn-success btn-block" type="submit" value="Follow"/>

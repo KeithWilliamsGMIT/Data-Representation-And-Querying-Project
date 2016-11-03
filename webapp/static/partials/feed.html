@@ -20,7 +20,7 @@
 <div ng-repeat="post in getFeed()">
     <div class="panel panel-default">
         <div class="panel-body">
-            <p>{{post.post.text}}</p>
+            <p ng-bind="post.post.text"></p>
         </div>
     </div>
 </div>

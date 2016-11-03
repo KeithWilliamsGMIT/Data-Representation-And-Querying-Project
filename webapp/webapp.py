@@ -73,5 +73,16 @@ def get_posts():
     posts = User(session["email"]).get_posts()
     return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
 
+@app.route('/search_users', methods=['POST'])
+def search_users():
+    data = request.get_json()
+    query = data["query"]
+
+    if not query:
+        return json.dumps({"status": "error", "message": "The search query was empty."})
+    else:
+        users = User(session["email"]).find_users_by_name(query)
+        return json.dumps({"status": "success", "message": "Successfully searched for user.", "users": users})
+
 if __name__ == "__main__":
     app.run(debug=DEBUG_MODE)

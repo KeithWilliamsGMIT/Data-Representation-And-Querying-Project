@@ -78,7 +78,7 @@ Alternatively, you can disable athentication by uncommenting the following line 
 dbms.security.auth_enabled=false
 ```
 
-Open [http://localhost:7474](http://localhost:7474) with your web browser to use the Neo4J GUI.
+Open [http://localhost:7474/browser/](http://localhost:7474/browser/) with your web browser to use the Neo4J GUI.
 
 ##### Running the webapp locally
 Clone the repository

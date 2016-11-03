@@ -81,6 +81,11 @@ angular.module ("app.services", [])
         return userData;
     }
     
+    // Reset all variables
+    function reset() {
+        userData.users = {};
+    }
+    
     return {
         register: register,
         login: login,
@@ -94,9 +99,6 @@ angular.module ("app.services", [])
     var feedData = {
         posts: []
     }
-    
-    // Get posts when the factory loads
-    getPosts();
     
     // Send an AJAX request to the server to add a new post
     function addPost(data) {
@@ -149,9 +151,60 @@ angular.module ("app.services", [])
         return feedData.posts;
     }
     
+    // Reset all variables
+    function reset() {
+        feedData.posts = [];
+        getPosts();
+    }
+    
     return {
         addPost: addPost,
-        getFeed: getFeed
+        getFeed: getFeed,
+        reset: reset
+    }
+})
+
+.factory("Search", function($http, Message) {
+    var searchData = {
+        users: null
+    }
+    
+    // Get a list of users that match the given query
+    function searchUsers(data) {
+        $http.post("/search_users", data)
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                // Redirect to the feed page if the user successfully signed in
+                if (response.data.status == "success") {
+                    searchData.users = response.data.users;
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    function getUsers() {
+        return searchData.users;
+    }
+    
+    // Reset all variables
+    function reset() {
+        searchData.users = [];
+    }
+    
+    return {
+        searchUsers: searchUsers,
+        getUsers: getUsers,
+        reset: reset
     }
 })
 

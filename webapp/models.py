@@ -51,7 +51,23 @@ class User:
         MATCH (user:User)-[:POSTED]->(post:Post)
         WHERE user.email = {email}
         RETURN post
+        LIMIT 20
         '''
         
         # Return a list of dictionaries which can be converted to JSON
         return graph.data(query, email=self.email)
+    
+    # Return other users whose names are equal to the query entered by the user
+    def find_users_by_name(self, name):
+        query = '''
+        MATCH (user:User)
+        WHERE user.name = {name} AND user.email <> {email}
+        RETURN user.name AS name, user.email As email
+        LIMIT 20
+        '''
+        
+        # Dictionary of parameters for the query
+        params = {'name': name, 'email': self.email}
+        
+        # Return a list of dictionaries which can be converted to JSON
+        return graph.data(query, params)

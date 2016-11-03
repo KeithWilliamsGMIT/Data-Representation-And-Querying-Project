@@ -28,6 +28,9 @@ angular.module ("app.controllers", [])
     
 })
 
-.controller("searchCtrl", function() {
-    
+.controller("searchCtrl", function($scope, Search, Message) {
+    $scope.searchUsers = Search.searchUsers;
+    $scope.getUsers = Search.getUsers;
+    $scope.getMessage = Message.getMessage;
+    $scope.hasMessage = Message.hasMessage;
 });

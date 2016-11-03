@@ -45,7 +45,7 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ngR
     $locationProvider.html5Mode(true);
 })
 
-.run(function($rootScope, $location, User, Message) {
+.run(function($rootScope, $location, User, Feed, Search, Message) {
     // Redirect to the login page if the user is not logged in and is not on the sign up page
     if (!User.isLoggedIn() && $location.path() != "/") {
         $location.path("/login");
@@ -55,10 +55,17 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ngR
         // clear any messages when the route changes
         Message.clearMessage();
         
-        // Adapted from http://stackoverflow.com/questions/12506329/how-to-dynamically-change-header-based-on-angularjs-partial-view
-        // Update the title when the route changes
         if (current.hasOwnProperty("$$route")) {
+            // Adapted from http://stackoverflow.com/questions/12506329/how-to-dynamically-change-header-based-on-angularjs-partial-view
+            // Update the title when the route changes
             $rootScope.title = current.$$route.title;
+            
+            // Reset factory variables when the user navigates to the view
+            if (current.$$route.originalPath == "/feed") {
+                Feed.reset();
+            } else if (current.$$route.originalPath == "/search") {
+                Search.reset();
+            }
         }
     });
 });
