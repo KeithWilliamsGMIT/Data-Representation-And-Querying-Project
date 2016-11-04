@@ -57,13 +57,37 @@ class User:
         # Return a list of dictionaries which can be converted to JSON
         return graph.data(query, email=self.email)
     
+    # Follow the user with the given email address
+    def follow_user(self, email):
+        user = self.find()
+        
+        # Get a user node with the given email
+        other = graph.find_one('User', 'email', email)
+        rel = Relationship(user, 'FOLLOWED', other)
+        graph.create(rel)
+    
+    # Unfollow the user with the given email address
+    def unfollow_user(self, email):
+        query = '''
+        MATCH (self:User)-[r:FOLLOWED]-(user:User)
+        WHERE self.email = {self} AND user.email = {user}
+        DELETE r;
+        '''
+        
+        # Dictionary of parameters for the query
+        params = {'self': self.email, 'user': email}
+        
+        # Run the query
+        graph.run(query, params)
+    
     # Return other users whose names are equal to the query entered by the user
     def find_users_by_name(self, name):
         query = '''
         MATCH (user:User)
-        WHERE user.name = {name} AND user.email <> {email}
-        RETURN user.name AS name, user.email As email
-        LIMIT 20
+        WHERE user.email <> {email} AND user.name = {name}
+        OPTIONAL MATCH (self)-[r:FOLLOWED]->(user)
+        WHERE self.email = {email}
+        RETURN user.name AS name, user.email AS email, r IS NOT NULL AS following;
         '''
         
         # Dictionary of parameters for the query

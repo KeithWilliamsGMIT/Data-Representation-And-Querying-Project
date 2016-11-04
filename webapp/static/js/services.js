@@ -108,10 +108,7 @@ angular.module ("app.services", [])
             function(response) {
                 console.log("Request successful!");
                 
-                // Redirect to the feed page if the user successfully signed in
-                if (response.data.status == "success") {
-                    console.log("Success");
-                } else {
+                if (response.data.status != "success") {
                     Message.setMessage(response.data.message);
                     console.log("Error Message: " + Message.getMessage());
                 }
@@ -131,7 +128,7 @@ angular.module ("app.services", [])
             function(response) {
                 console.log("Request successful!");
                 
-                // Redirect to the feed page if the user successfully signed in
+                // Store the posts in a variable if the request was successful
                 if (response.data.status == "success") {
                     feedData.posts = response.data.posts;
                 } else {
@@ -169,6 +166,52 @@ angular.module ("app.services", [])
         users: null
     }
     
+    // Follow a user and set the user at the given index in the list of users to 'following' if the request was successful
+    function follow(data, index) {
+        $http.post("/follow", data)
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                if (response.data.status == "success") {
+                    searchData.users[index].following = true;
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    // Unfollow a user and set the user at the given index in the list of users to 'unfollowing' if the request was successful
+    function unfollow(data, index) {
+        console.log("UNFOLLOW");
+        
+        $http.post("/unfollow", data)
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                if (response.data.status == "success") {
+                    searchData.users[index].following = false;
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
     // Get a list of users that match the given query
     function searchUsers(data) {
         $http.post("/search_users", data)
@@ -177,7 +220,7 @@ angular.module ("app.services", [])
             function(response) {
                 console.log("Request successful!");
                 
-                // Redirect to the feed page if the user successfully signed in
+                // Store the list of users if the request was successful
                 if (response.data.status == "success") {
                     searchData.users = response.data.users;
                 } else {
@@ -202,6 +245,8 @@ angular.module ("app.services", [])
     }
     
     return {
+        follow: follow,
+        unfollow: unfollow,
         searchUsers: searchUsers,
         getUsers: getUsers,
         reset: reset

@@ -73,6 +73,22 @@ def get_posts():
     posts = User(session["email"]).get_posts()
     return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
 
+@app.route('/follow', methods=['POST'])
+def follow():
+    data = request.get_json()
+    email = data["email"]
+    
+    User(session["email"]).follow_user(email)
+    return json.dumps({"status": "success", "message": "Successfully followed user."})
+
+@app.route('/unfollow', methods=['POST'])
+def unfollow():
+    data = request.get_json()
+    email = data["email"]
+    
+    User(session["email"]).unfollow_user(email)
+    return json.dumps({"status": "success", "message": "Successfully unfollowed user."})
+
 @app.route('/search_users', methods=['POST'])
 def search_users():
     data = request.get_json()

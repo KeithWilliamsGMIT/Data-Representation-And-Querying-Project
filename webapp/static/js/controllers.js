@@ -31,6 +31,8 @@ angular.module ("app.controllers", [])
 .controller("searchCtrl", function($scope, Search, Message) {
     $scope.searchUsers = Search.searchUsers;
     $scope.getUsers = Search.getUsers;
+    $scope.follow = Search.follow;
+    $scope.unfollow = Search.unfollow;
     $scope.getMessage = Message.getMessage;
     $scope.hasMessage = Message.hasMessage;
 });
