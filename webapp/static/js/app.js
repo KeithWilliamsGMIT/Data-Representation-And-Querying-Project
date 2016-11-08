@@ -63,6 +63,10 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ngR
             // Reset factory variables when the user navigates to the view
             if (current.$$route.originalPath == "/feed") {
                 Feed.reset();
+                Feed.getAllRecentPosts();
+            } else if (current.$$route.originalPath == "/profile") {
+                Feed.reset();
+                Feed.getOwnPosts();
             } else if (current.$$route.originalPath == "/search") {
                 Search.reset();
             }

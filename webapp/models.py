@@ -1,5 +1,6 @@
 from py2neo import Graph, Node, Relationship
 from passlib.hash import bcrypt
+from datetime import datetime
 import os
 
 # Get environmental variables need to connect to Neo4J database
@@ -41,21 +42,41 @@ class User:
     # Add the post to the database
     def add_post(self, text):
         user = self.find()
-        post = Node('Post', text=text)
+        post = Node('Post', text=text, timestamp=timestamp())
         rel = Relationship(user, 'POSTED', post)
         graph.create(rel)
     
     # Return all posts written by the current user
-    def get_posts(self):
+    def get_own_posts(self):
         query = '''
-        MATCH (user:User)-[:POSTED]->(post:Post)
-        WHERE user.email = {email}
-        RETURN post
+        MATCH (self:User)-[:POSTED]->(post:Post)
+        WHERE self.email = {self}
+        RETURN post.text AS message, post.timestamp AS timestamp, self.name AS name
+        ORDER BY post.timestamp DESC
         LIMIT 20
         '''
         
+        # Dictionary of parameters for the query
+        params = {'self': self.email}
+        
         # Return a list of dictionaries which can be converted to JSON
-        return graph.data(query, email=self.email)
+        return graph.data(query, params)
+    
+    # Return recent posts written by the current user and who they follow
+    def get_all_recent_posts(self, timestamp):
+        query = '''
+        MATCH (self:User)-[:FOLLOWED*0..1]->(user)-[:POSTED]->(post)
+        WHERE self.email = {self} AND post.timestamp > {timestamp}
+        RETURN post.text AS message, post.timestamp AS timestamp, user.name AS name
+        ORDER BY post.timestamp DESC
+        LIMIT 20;
+        '''
+        
+        # Dictionary of parameters for the query
+        params = {'self': self.email, 'timestamp': timestamp}
+        
+        # Return a list of dictionaries which can be converted to JSON
+        return graph.data(query, params)
     
     # Follow the user with the given email address
     def follow_user(self, email):
@@ -95,3 +116,10 @@ class User:
         
         # Return a list of dictionaries which can be converted to JSON
         return graph.data(query, params)
+
+# Return a timestamp in seconds
+def timestamp():
+    epoch = datetime.utcfromtimestamp(0)
+    now = datetime.now()
+    delta = now - epoch
+    return delta.total_seconds()

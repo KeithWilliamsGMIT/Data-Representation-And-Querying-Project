@@ -1,0 +1,9 @@
+<!-- Display a list of all posts -->
+<div ng-repeat="post in getFeed() track by $index">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <h6 ng-bind="post.name"></h6>
+            <p ng-bind="post.message"></p>
+        </div>
+    </div>
+</div>

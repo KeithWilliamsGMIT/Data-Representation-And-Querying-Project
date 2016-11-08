@@ -28,4 +28,12 @@ angular.module ("app.directives", [])
             });
         }
     }
-});
+})
+
+.directive("posts", function(){
+      return {
+        restrict: "E",
+        scope: false,
+        templateUrl: "../static/partials/widgets/posts.html"
+      }
+});;

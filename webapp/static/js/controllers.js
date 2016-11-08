@@ -18,14 +18,20 @@ angular.module ("app.controllers", [])
 })
 
 .controller("feedCtrl", function($scope, Feed, Message) {
-    $scope.addPost = Feed.addPost;
+    // Clear the post box when the form is submitted
+    function addPost(data) {
+        Feed.addPost(angular.copy(data));
+        data.text = "";
+    }
+    
+    $scope.addPost = addPost;
     $scope.getFeed = Feed.getFeed;
     $scope.getMessage = Message.getMessage;
     $scope.hasMessage = Message.hasMessage;
 })
 
-.controller("profileCtrl", function() {
-    
+.controller("profileCtrl", function($scope, Feed) {
+    $scope.getFeed = Feed.getFeed;
 })
 
 .controller("searchCtrl", function($scope, Search, Message) {

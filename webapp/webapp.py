@@ -68,9 +68,17 @@ def add_post():
         User(session["email"]).add_post(text)
         return json.dumps({"status": "success", "message": "Successfully added post."})
 
-@app.route('/get_posts', methods=['GET'])
-def get_posts():
-    posts = User(session["email"]).get_posts()
+@app.route('/get_own_posts', methods=['GET'])
+def get_own_posts():
+    posts = User(session["email"]).get_own_posts()
+    return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
+
+@app.route('/get_all_recent_posts', methods=['POST'])
+def get_all_recent_posts():
+    data = request.get_json()
+    timestamp = data["timestamp"]
+    
+    posts = User(session["email"]).get_all_recent_posts(timestamp)
     return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
 
 @app.route('/follow', methods=['POST'])

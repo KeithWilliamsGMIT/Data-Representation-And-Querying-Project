@@ -108,7 +108,9 @@ angular.module ("app.services", [])
             function(response) {
                 console.log("Request successful!");
                 
-                if (response.data.status != "success") {
+                if (response.data.status == "success") {
+                    getAllRecentPosts();
+                } else {
                     Message.setMessage(response.data.message);
                     console.log("Error Message: " + Message.getMessage());
                 }
@@ -121,8 +123,8 @@ angular.module ("app.services", [])
     }
     
     // Get all posts written by the current user
-    function getPosts() {
-        $http.get("/get_posts")
+    function getOwnPosts() {
+        $http.get("/get_own_posts")
         
         .then(
             function(response) {
@@ -143,6 +145,50 @@ angular.module ("app.services", [])
         );
     }
     
+    // Get all recent posts written by the current user and who they follow
+    function getAllRecentPosts() {
+        var data = {
+            timestamp: 0
+        }
+        
+        if (feedData.posts.length > 0) {
+            data.timestamp = feedData.posts[0].timestamp;
+        }
+        
+        $http.post("/get_all_recent_posts", data)
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                // Add the posts to the beginning of the list if the request was successful
+                if (response.data.status == "success") {
+                    if (feedData.posts.length == 0) {
+                        // If there are no posts already, simply store the response
+                        feedData.posts = response.data.posts;
+                    } else {
+                        // If there are posts previously requested it would be wasteful to request them a second time.
+                        // Instead, retrieve te posts that were made since the timestamp of the most recent post.
+                        // Add the posts to the start of list of posts.
+                        // Looping through the posts in the response and using the unshift method are both O(n) operations.
+                        // This might lead to performance problems if theres a lot of posts in the reponse,
+                        // or if there's a lot of posts that have to be shifted.
+                        for (var i = response.data.posts.length - 1; i >= 0; --i) {
+                            feedData.posts.unshift(response.data.posts[i]);
+                        }
+                    }
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
     // Return all the posts in the feed
     function getFeed() {
         return feedData.posts;
@@ -151,11 +197,12 @@ angular.module ("app.services", [])
     // Reset all variables
     function reset() {
         feedData.posts = [];
-        getPosts();
     }
     
     return {
         addPost: addPost,
+        getOwnPosts: getOwnPosts,
+        getAllRecentPosts: getAllRecentPosts,
         getFeed: getFeed,
         reset: reset
     }
@@ -190,8 +237,6 @@ angular.module ("app.services", [])
     
     // Unfollow a user and set the user at the given index in the list of users to 'unfollowing' if the request was successful
     function unfollow(data, index) {
-        console.log("UNFOLLOW");
-        
         $http.post("/unfollow", data)
         
         .then(
