@@ -208,53 +208,23 @@ angular.module ("app.services", [])
     }
 })
 
-.factory("Search", function($http, Message) {
+.factory("Search", function($http, Connections, Message) {
     var searchData = {
         users: null
     }
     
     // Follow a user and set the user at the given index in the list of users to 'following' if the request was successful
     function follow(data, index) {
-        $http.post("/follow", data)
-        
-        .then(
-            function(response) {
-                console.log("Request successful!");
-                
-                if (response.data.status == "success") {
-                    searchData.users[index].following = true;
-                } else {
-                    Message.setMessage(response.data.message);
-                    console.log("Error Message: " + Message.getMessage());
-                }
-            },
-
-            function(response) {
-                console.log("Request failed!\n" + JSON.stringify(response));
-            }
-        );
+        Connections.follow(data, function() {
+            searchData.users[index].following = true;
+        });
     }
     
     // Unfollow a user and set the user at the given index in the list of users to 'unfollowing' if the request was successful
     function unfollow(data, index) {
-        $http.post("/unfollow", data)
-        
-        .then(
-            function(response) {
-                console.log("Request successful!");
-                
-                if (response.data.status == "success") {
-                    searchData.users[index].following = false;
-                } else {
-                    Message.setMessage(response.data.message);
-                    console.log("Error Message: " + Message.getMessage());
-                }
-            },
-
-            function(response) {
-                console.log("Request failed!\n" + JSON.stringify(response));
-            }
-        );
+         Connections.unfollow(data, function() {
+            searchData.users[index].following = false;
+        });
     }
     
     // Get a list of users that match the given query
@@ -295,6 +265,149 @@ angular.module ("app.services", [])
         searchUsers: searchUsers,
         getUsers: getUsers,
         reset: reset
+    }
+})
+
+.factory("Profile", function(Connections) {
+    var profileData = {
+        followers: [],
+        following: []
+    }
+    
+    // Retrieve a list of all the users that follow this user and store them in a list
+    function getFollowers() {
+        Connections.getFollowers(function(followers) {
+            profileData.followers = followers;
+        });
+    }
+    
+    // Retrieve a list of all the users that this user follows and store them in a list
+    function getFollowing() {
+        Connections.getFollowing(function(following) {
+            profileData.following = following;
+        });
+    }
+    
+    // Return the number of followers the current user has
+    function countFollowers() {
+        return profileData.followers.length;
+    }
+    
+    // Return the number of users the current user follows
+    function countFollowing() {
+        return profileData.following.length;
+    }
+    
+    function reset() {
+        getFollowers();
+        getFollowing();
+    }
+    
+    return {
+        getFollowers: function() { return profileData.followers; } ,
+        getFollowing: function() { return profileData.following; },
+        countFollowers: countFollowers,
+        countFollowing: countFollowing,
+        reset: reset
+    }
+})
+
+.factory("Connections", function($http, Message) {
+    // Follow a user and call the successCallback if the request was successful
+    function follow(data, successCallback) {
+        $http.post("/follow", data)
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                if (response.data.status == "success") {
+                    successCallback();
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    // Unfollow a user and call the successCallback if the request was successful
+    function unfollow(data, successCallback) {
+        $http.post("/unfollow", data)
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                if (response.data.status == "success") {
+                    successCallback();
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    // Retrieve a list of the users that follow the current user
+    // If the request was successful call the successCallback
+    function getFollowers(successCallback) {
+        $http.get("/get_followers")
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                if (response.data.status == "success") {
+                    successCallback(response.data.users);
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    // Retrieve a list of the users that the current user follows
+    // If the request was successful call the successCallback
+    function getFollowing(successCallback) {
+        $http.get("/get_following")
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                if (response.data.status == "success") {
+                    successCallback(response.data.users);
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    return {
+        follow: follow,
+        unfollow: unfollow,
+        getFollowers: getFollowers,
+        getFollowing: getFollowing
     }
 })
 

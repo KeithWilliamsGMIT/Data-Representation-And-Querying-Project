@@ -1,7 +1,7 @@
 # Data-Representation-And-Querying-Project
 
 #### Description
-This is my 3rd year project for my data representation and querying module for college. The aim of this project is to write a single page web application in Python using the Flask framework.
+This is my 3rd year project for my data representation and querying module for college. The aim of this project is to write a single page web application in Python using the Flask microframework.
 
 #### Planning Stage
 
@@ -18,13 +18,15 @@ After considering the above goals I chose to develop a webapp similar to Twitter
 ##### MVP
 The MVP will only contain features vital to any social network. It should have a user friendly layout and should also be designed so that additional features will be easy to integrate. With this in mind I decided that the MVP should have five views.
 
-1. Sign up and login views
-   - The sign up and login will be very basic. There will be no email confirmation, forgot/reset password option or "remember me" option.
-2. Feeds view
+1. Sign up view
+   - The sign up will be very basic. There will be no email confirmation.
+2. Login view
+   - The login view will also be very basic. There will be no forgot/reset password option or "remember me" option.
+3. Feeds view
    - The feed view will allow users to write posts, but they can only be plain text, and to read other peoples posts.
-3. Search view
+4. Search view
    - Users can search for other people to follow.
-4. Profile view
+5. Profile view
    - Display posts written by the user and the users details. There will be no user profile image in the MVP.
 
 ##### Additional features
@@ -58,6 +60,11 @@ Python3 and the Flask microframework were requirements for this project.
 
 A graph database seemed like the obvious choice of database for a social network as the data is not linear by nature.
 
+##### Resources
+The following two git repositories were very helpful when deciding how to structure the project.
++ [angular-flask](https://github.com/shea256/angular-flask)
++ [neo4j-flask](https://github.com/nicolewhite/neo4j-flask)
+
 #### Deployment Stage
 
 ##### Setting up Neo4J locally
@@ -81,6 +88,8 @@ dbms.security.auth_enabled=false
 Open [http://localhost:7474/browser/](http://localhost:7474/browser/) with your web browser to use the Neo4J GUI.
 
 ##### Running the webapp locally
+Internet access is required when running the webapp locally as it uses a number of files from different CDN's.
+
 Clone the repository
 ```
 git clone https://github.com/KeithWilliamsGMIT/Data-Representation-And-Querying-Project.git

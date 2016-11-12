@@ -12,24 +12,7 @@
     </div>
 </div>
 
-<!-- Display results -->
+<!-- Display search results -->
 <div class="row-fluid margin-top-10" ng-repeat="user in getUsers() track by $index">
-    <div class="col-sm-4">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <h4 ng-bind="user.name"></h4>
-                <h5 ng-bind="user.email"></h5>
-                
-                <!-- Follow button -->
-                <form ng-hide="user.following" ng-submit="follow(user, $index)">
-                    <input class="btn btn-success btn-block" type="submit" value="Follow"/>
-                </form>
-                
-                <!-- Unfollow button -->
-                <form ng-show="user.following" ng-submit="unfollow(user, $index)">
-                    <input class="btn btn-danger btn-block" type="submit" value="Unfollow"/>
-                </form>
-            </div>
-        </div>
-    </div>
+    <users></users>
 </div>

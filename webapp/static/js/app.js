@@ -45,7 +45,7 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ngR
     $locationProvider.html5Mode(true);
 })
 
-.run(function($rootScope, $location, User, Feed, Search, Message) {
+.run(function($rootScope, $location, User, Feed, Profile, Search, Message) {
     // Redirect to the login page if the user is not logged in and is not on the sign up page
     if (!User.isLoggedIn() && $location.path() != "/") {
         $location.path("/login");
@@ -65,6 +65,7 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ngR
                 Feed.reset();
                 Feed.getAllRecentPosts();
             } else if (current.$$route.originalPath == "/profile") {
+                Profile.reset();
                 Feed.reset();
                 Feed.getOwnPosts();
             } else if (current.$$route.originalPath == "/search") {

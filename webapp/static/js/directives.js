@@ -36,4 +36,12 @@ angular.module ("app.directives", [])
         scope: false,
         templateUrl: "../static/partials/widgets/posts.html"
       }
-});;
+})
+
+.directive("users", function(){
+      return {
+        restrict: "E",
+        scope: false,
+        templateUrl: "../static/partials/widgets/users.html"
+      }
+});

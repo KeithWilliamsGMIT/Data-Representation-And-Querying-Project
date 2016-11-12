@@ -101,20 +101,50 @@ class User:
         # Run the query
         graph.run(query, params)
     
-    # Return other users whose names are equal to the query entered by the user
+    # Return other users whose names have the value entered by the user as a substring
+    # This search ignores case
     def find_users_by_name(self, name):
         query = '''
         MATCH (user:User)
-        WHERE user.email <> {email} AND user.name = {name}
+        WHERE user.email <> {email} AND user.name =~ {name}
         OPTIONAL MATCH (self)-[r:FOLLOWED]->(user)
         WHERE self.email = {email}
         RETURN user.name AS name, user.email AS email, r IS NOT NULL AS following;
         '''
         
         # Dictionary of parameters for the query
-        params = {'name': name, 'email': self.email}
+        params = {'name': '(?i).*' + name + '.*', 'email': self.email}
         
         # Return a list of dictionaries which can be converted to JSON
+        return graph.data(query, params)
+    
+    # Get all the users that follow the current user
+    def get_followers(self):
+        query = '''
+        MATCH (user:User)-[:FOLLOWED]->(self:User)
+        WHERE self.email = {self}
+        OPTIONAL MATCH (self:User)-[r:FOLLOWED]->(user:User)
+        RETURN user.name AS name, user.email AS email, r IS NOT NULL AS following;
+        '''
+        
+        # Dictionary of parameters for the query
+        params = {'self': self.email}
+        
+        # Run the query
+        return graph.data(query, params)
+    
+     # Get all the users that the current user follows
+    def get_following(self):
+        query = '''
+        MATCH (self:User)-[FOLLOWED]->(user:User)
+        WHERE self.email = {self}
+        RETURN user.name AS name, user.email AS email, true AS following;
+        '''
+        
+        # Dictionary of parameters for the query
+        params = {'self': self.email}
+        
+        # Run the query
         return graph.data(query, params)
 
 # Return a timestamp in seconds

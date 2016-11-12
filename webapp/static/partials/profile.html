@@ -1,4 +1,23 @@
 <h2>Profile</h2>
 
+<!-- Display followers -->
+<h4 ng-bind="'Followers (' + countFollowers() + ')'"></h4>
+
+<div class="container">
+    <div class="row-fluid margin-top-10" ng-repeat="user in getFollowers() track by $index">
+        <users></users>
+    </div>
+</div>
+
+<!-- Display following -->
+<h4 ng-bind="'Following (' + countFollowing() + ')'"></h4>
+
+<div class="container">
+    <div class="row-fluid margin-top-10" ng-repeat="user in getFollowing() track by $index">
+        <users></users>
+    </div>
+</div>
+
 <!-- Display posts here -->
+<h4>Posts</h4>
 <posts></posts>

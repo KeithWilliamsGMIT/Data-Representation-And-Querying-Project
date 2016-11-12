@@ -108,5 +108,15 @@ def search_users():
         users = User(session["email"]).find_users_by_name(query)
         return json.dumps({"status": "success", "message": "Successfully searched for user.", "users": users})
 
+@app.route('/get_followers', methods=['GET'])
+def get_followers():
+    users = User(session["email"]).get_followers()
+    return json.dumps({"status": "success", "message": "Successfully retrieved this users followers.", "users": users})
+
+@app.route('/get_following', methods=['GET'])
+def get_following():
+    users = User(session["email"]).get_following()
+    return json.dumps({"status": "success", "message": "Successfully retrieved the users this user is following.", "users": users})
+
 if __name__ == "__main__":
     app.run(debug=DEBUG_MODE)

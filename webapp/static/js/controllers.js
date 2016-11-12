@@ -30,7 +30,11 @@ angular.module ("app.controllers", [])
     $scope.hasMessage = Message.hasMessage;
 })
 
-.controller("profileCtrl", function($scope, Feed) {
+.controller("profileCtrl", function($scope, Profile, Feed) {
+    $scope.getFollowers = Profile.getFollowers;
+    $scope.getFollowing = Profile.getFollowing;
+    $scope.countFollowers = Profile.countFollowers;
+    $scope.countFollowing = Profile.countFollowing;
     $scope.getFeed = Feed.getFeed;
 })
 
