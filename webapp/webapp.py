@@ -14,7 +14,9 @@ app.secret_key = os.urandom(24)
 @app.route("/")
 @app.route("/login")
 @app.route("/feed")
-@app.route("/profile")
+@app.route("/profile/posts")
+@app.route("/profile/followers")
+@app.route("/profile/following")
 @app.route("/search")
 def index():
     # make_response does not cache the page

@@ -47,6 +47,8 @@ The following are some of the features I'd like to add once the MVP is complete.
 
 The AngularJS framework was used to handle the routing on the client side and because it allowed the JavaScript to be written in a structured way, using the MVC pattern.
 
+Ng Route was originally used for the client side routing, but I then switched to UI Router for nested views.
+
 - Bootstrap
 
 Bootstrap allowed me to focus on developing the functionality of the webapp rather than the responsiveness or cross browser compatability which ultimately sped up development.

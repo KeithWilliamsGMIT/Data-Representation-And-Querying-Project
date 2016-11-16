@@ -25,7 +25,7 @@
                         </button>
                     </div>
                     
-                    <a class="navbar-brand" href="#">Name</a>
+                    <a class="navbar-brand">Name</a>
                 </div>
                 
                 <!-- Collapse this section of the navbar on small screens -->
@@ -33,13 +33,13 @@
                     <!-- Only show the menu to users that are logged in -->
                     <!-- Add the auto-active-link directive to the menu to highlight the menu button that links to the current page -->
                     <ul class="nav navbar-nav navbar-right" auto-active-link ng-show="isLoggedIn()" ng-cloak>
-                        <li><a href="/feed">Feed</a></li>
-                        <li><a href="/search">Search</a></li>
+                        <li><a ui-sref="feed">Feed</a></li>
+                        <li><a ui-sref="search">Search</a></li>
 
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a href="/profile">Profile</a></li>
+                                <li><a ui-sref="profile.posts">Profile</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a ng-click="logout()">Logout</a></li>
                             </ul>
@@ -50,7 +50,7 @@
         </nav>
         
         <!-- The partials will be displayed inside this div tag -->
-        <div ng-view class="container"></div>
+        <div ui-view class="container"></div>
         
         <!-- Include external files at the end of the body and include the css files first to make the load time appear quicker -->
         <!-- Bootstrap CSS CDN -->
@@ -60,8 +60,8 @@
         <link rel="stylesheet" type="text/css" href="/static/css/style.css">
         
         <!-- AngularJS CDN -->
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular-route.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.2/angular-ui-router.min.js"></script>
         
         <!-- JS Files -->
         <script src="/static/js/app.js"></script>

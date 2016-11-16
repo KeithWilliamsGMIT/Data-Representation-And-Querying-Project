@@ -77,10 +77,6 @@ angular.module ("app.services", [])
         return !angular.equals({}, userData);
     }
     
-    function getUserData() {
-        return userData;
-    }
-    
     // Reset all variables
     function reset() {
         userData.users = {};
@@ -90,103 +86,49 @@ angular.module ("app.services", [])
         register: register,
         login: login,
         logout: logout,
-        isLoggedIn: isLoggedIn,
-        getUserData: getUserData
+        isLoggedIn: isLoggedIn
     }
 })
 
-.factory("Feed", function($http, Message) {
+.factory("Feed", function(Posts) {
     var feedData = {
         posts: []
     }
     
-    // Send an AJAX request to the server to add a new post
+    // Add a new post it to the database
     function addPost(data) {
-        $http.post("/add_post", data)
-        
-        .then(
-            function(response) {
-                console.log("Request successful!");
-                
-                if (response.data.status == "success") {
-                    getAllRecentPosts();
-                } else {
-                    Message.setMessage(response.data.message);
-                    console.log("Error Message: " + Message.getMessage());
-                }
-            },
-
-            function(response) {
-                console.log("Request failed!\n" + JSON.stringify(response));
-            }
-        );
-    }
-    
-    // Get all posts written by the current user
-    function getOwnPosts() {
-        $http.get("/get_own_posts")
-        
-        .then(
-            function(response) {
-                console.log("Request successful!");
-                
-                // Store the posts in a variable if the request was successful
-                if (response.data.status == "success") {
-                    feedData.posts = response.data.posts;
-                } else {
-                    Message.setMessage(response.data.message);
-                    console.log("Error Message: " + Message.getMessage());
-                }
-            },
-
-            function(response) {
-                console.log("Request failed!\n" + JSON.stringify(response));
-            }
-        );
+        Posts.addPost(data, function() {
+            getAllRecentPosts();
+        });
     }
     
     // Get all recent posts written by the current user and who they follow
+    // Add the posts to the beginning of the list if the request was successful
     function getAllRecentPosts() {
-        var data = {
-            timestamp: 0
-        }
-        
+        // Get the timestamp of the most recent post
+        // If there are no posts set the timestamp to 0
         if (feedData.posts.length > 0) {
-            data.timestamp = feedData.posts[0].timestamp;
+            timestamp = feedData.posts[0].timestamp;
+        } else {
+            timestamp = 0;
         }
         
-        $http.post("/get_all_recent_posts", data)
-        
-        .then(
-            function(response) {
-                console.log("Request successful!");
-                
-                // Add the posts to the beginning of the list if the request was successful
-                if (response.data.status == "success") {
-                    if (feedData.posts.length == 0) {
-                        // If there are no posts already, simply store the response
-                        feedData.posts = response.data.posts;
-                    } else {
-                        // If there are posts previously requested it would be wasteful to request them a second time.
-                        // Instead, retrieve te posts that were made since the timestamp of the most recent post.
-                        // Add the posts to the start of list of posts.
-                        // Looping through the posts in the response and using the unshift method are both O(n) operations.
-                        // This might lead to performance problems if theres a lot of posts in the reponse,
-                        // or if there's a lot of posts that have to be shifted.
-                        for (var i = response.data.posts.length - 1; i >= 0; --i) {
-                            feedData.posts.unshift(response.data.posts[i]);
-                        }
-                    }
-                } else {
-                    Message.setMessage(response.data.message);
-                    console.log("Error Message: " + Message.getMessage());
+        Posts.getAllRecentPosts(timestamp, function(posts) {
+            if (timestamp == 0) {
+                // If there are no posts already, simply store the response
+                feedData.posts = posts;
+            } else {
+                // If there are posts previously requested it would be wasteful to request them a second time.
+                // Instead, retrieve te posts that were made since the timestamp of the most recent post.
+                // Add the posts to the start of list of posts.
+                // Looping through the posts in the response and using the unshift method are both O(n) operations.
+                // This might lead to performance problems if theres a lot of posts in the reponse,
+                // or if there's a lot of posts that have to be shifted.
+                for (var i = posts.length - 1; i >= 0; --i) {
+                    feedData.posts.unshift(posts[i]);
                 }
-            },
-
-            function(response) {
-                console.log("Request failed!\n" + JSON.stringify(response));
             }
-        );
+        });
     }
     
     // Return all the posts in the feed
@@ -196,13 +138,11 @@ angular.module ("app.services", [])
     
     // Reset all variables
     function reset() {
-        feedData.posts = [];
+        feedData.posts = getAllRecentPosts();
     }
     
     return {
         addPost: addPost,
-        getOwnPosts: getOwnPosts,
-        getAllRecentPosts: getAllRecentPosts,
         getFeed: getFeed,
         reset: reset
     }
@@ -268,50 +208,192 @@ angular.module ("app.services", [])
     }
 })
 
-.factory("Profile", function(Connections) {
+.factory("Profile", function(Posts) {
     var profileData = {
-        followers: [],
-        following: []
+        myPosts: []
     }
     
-    // Retrieve a list of all the users that follow this user and store them in a list
+    // Return te list of posts written by the current user
+    function getMyPosts () {
+        return profileData.myPosts;
+    }
+    
+    function reset() {
+        Posts.getOwnPosts(function(posts) {
+            profileData.myPosts = posts;
+        });
+    }
+    
+    return {
+        getMyPosts: getMyPosts,
+        reset: reset
+    }
+})
+
+// This factory stores data used by the followers widget
+.factory("Followers", function(Connections) {
+    var followersData = {
+        followers: []
+    }
+    
+    // Follow the user at the given index in the followers list
+    function follow(data, index) {
+        Connections.follow(data, function() {
+            followersData.followers[index].following = true;
+        });
+    }
+    
+    // Unfollow the user at the given index in the followers list
+    function unfollow(data, index) {
+        Connections.unfollow(data, function () {
+            followersData.followers[index].following = false;
+        });
+    }
+    
+    // Return the list of followers
     function getFollowers() {
-        Connections.getFollowers(function(followers) {
-            profileData.followers = followers;
-        });
-    }
-    
-    // Retrieve a list of all the users that this user follows and store them in a list
-    function getFollowing() {
-        Connections.getFollowing(function(following) {
-            profileData.following = following;
-        });
+        return followersData.followers;
     }
     
     // Return the number of followers the current user has
     function countFollowers() {
-        return profileData.followers.length;
-    }
-    
-    // Return the number of users the current user follows
-    function countFollowing() {
-        return profileData.following.length;
+        return followersData.followers.length;
     }
     
     function reset() {
-        getFollowers();
-        getFollowing();
+        Connections.getFollowers(function(followers) {
+            followersData.followers = followers;
+        });
     }
     
     return {
-        getFollowers: function() { return profileData.followers; } ,
-        getFollowing: function() { return profileData.following; },
+        follow: follow,
+        unfollow: unfollow,
+        getFollowers: getFollowers,
         countFollowers: countFollowers,
+        reset: reset
+    }
+})
+
+// This factory stores data used by the following widget
+.factory("Following", function(Connections) {
+    var followingData = {
+        following: []
+    }
+    
+    // Unfollow the user at the given index in the followers list
+    // Remove the user from the following list if they were successfully unfollowed
+    function unfollow(data, index) {
+        Connections.unfollow(data, function () {
+            followingData.following.splice(index, 1);
+        });
+    }
+    
+    // Return the list of users that follow the current user
+    function getFollowing() {
+        return followingData.following;
+    }
+    
+    // Return the number of users following the current user
+    function countFollowing() {
+        return followingData.following.length;
+    }
+    
+    function reset() {
+        Connections.getFollowing(function(following) {
+            followingData.following = following;
+        });
+    }
+    
+    return {
+        unfollow: unfollow,
+        getFollowing: getFollowing,
         countFollowing: countFollowing,
         reset: reset
     }
 })
 
+// Handle all post related actions
+.factory("Posts", function($http, Message) {
+    // Send an AJAX request to the server to add a new post
+    function addPost(data, successCallback) {
+        $http.post("/add_post", data)
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                if (response.data.status == "success") {
+                    successCallback();
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    // Get all posts written by the current user
+    function getOwnPosts(successCallback) {
+        $http.get("/get_own_posts")
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                // Store the posts in a variable if the request was successful
+                if (response.data.status == "success") {
+                    successCallback(response.data.posts);
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    // Get all recent posts written by the current user and who they follow
+    function getAllRecentPosts(timestamp, successCallback) {
+        var data = {
+            timestamp: 0
+        }
+        
+        $http.post("/get_all_recent_posts", data)
+        
+        .then(
+            function(response) {
+                console.log("Request successful!");
+                
+                if (response.data.status == "success") {
+                    successCallback(response.data.posts);
+                } else {
+                    Message.setMessage(response.data.message);
+                    console.log("Error Message: " + Message.getMessage());
+                }
+            },
+
+            function(response) {
+                console.log("Request failed!\n" + JSON.stringify(response));
+            }
+        );
+    }
+    
+    return {
+        addPost: addPost,
+        getOwnPosts: getOwnPosts,
+        getAllRecentPosts: getAllRecentPosts
+    }
+})
+
+// The Connections factory handles all relationships between users
 .factory("Connections", function($http, Message) {
     // Follow a user and call the successCallback if the request was successful
     function follow(data, successCallback) {

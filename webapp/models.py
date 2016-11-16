@@ -90,7 +90,7 @@ class User:
     # Unfollow the user with the given email address
     def unfollow_user(self, email):
         query = '''
-        MATCH (self:User)-[r:FOLLOWED]-(user:User)
+        MATCH (self:User)-[r:FOLLOWED]->(user:User)
         WHERE self.email = {self} AND user.email = {user}
         DELETE r;
         '''

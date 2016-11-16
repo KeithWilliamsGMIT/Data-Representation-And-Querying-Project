@@ -1,0 +1,8 @@
+<!-- Display following -->
+<h4 ng-bind="'Following (' + countFollowing() + ')'"></h4>
+
+<div class="container">
+    <div class="row-fluid margin-top-10" ng-repeat="user in getFollowing() track by $index">
+        <users></users>
+    </div>
+</div>

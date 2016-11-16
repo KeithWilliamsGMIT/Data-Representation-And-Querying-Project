@@ -1,0 +1,8 @@
+<!-- Display followers -->
+<h4 ng-bind="'Followers (' + countFollowers() + ')'"></h4>
+
+<div class="container">
+    <div class="row-fluid margin-top-10" ng-repeat="user in getFollowers() track by $index">
+        <users></users>
+    </div>
+</div>
