@@ -114,7 +114,7 @@ angular.module ("app.services", [])
         }
         
         Posts.getAllRecentPosts(timestamp, function(posts) {
-            if (timestamp == 0) {
+            if (feedData.posts.length == 0) {
                 // If there are no posts already, simply store the response
                 feedData.posts = posts;
             } else {
@@ -138,7 +138,7 @@ angular.module ("app.services", [])
     
     // Reset all variables
     function reset() {
-        feedData.posts = getAllRecentPosts();
+        getAllRecentPosts();
     }
     
     return {
@@ -363,7 +363,7 @@ angular.module ("app.services", [])
     // Get all recent posts written by the current user and who they follow
     function getAllRecentPosts(timestamp, successCallback) {
         var data = {
-            timestamp: 0
+            timestamp: timestamp
         }
         
         $http.post("/get_all_recent_posts", data)

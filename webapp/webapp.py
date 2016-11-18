@@ -59,7 +59,7 @@ def logout():
     session.pop("email", None)
     return json.dumps({"status": "success", "message": "User successfully logged out."})
 
-@app.route('/add_post', methods=['POST'])
+@app.route("/add_post", methods=["POST"])
 def add_post():
     data = request.get_json()
     text = data["text"]
@@ -70,36 +70,36 @@ def add_post():
         User(session["email"]).add_post(text)
         return json.dumps({"status": "success", "message": "Successfully added post."})
 
-@app.route('/get_own_posts', methods=['GET'])
+@app.route("/get_own_posts", methods=["GET"])
 def get_own_posts():
     posts = User(session["email"]).get_own_posts()
     return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
 
-@app.route('/get_all_recent_posts', methods=['POST'])
+@app.route("/get_all_recent_posts", methods=["POST"])
 def get_all_recent_posts():
     data = request.get_json()
     timestamp = data["timestamp"]
-    
+
     posts = User(session["email"]).get_all_recent_posts(timestamp)
     return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
 
-@app.route('/follow', methods=['POST'])
+@app.route("/follow", methods=["POST"])
 def follow():
     data = request.get_json()
     email = data["email"]
-    
+
     User(session["email"]).follow_user(email)
     return json.dumps({"status": "success", "message": "Successfully followed user."})
 
-@app.route('/unfollow', methods=['POST'])
+@app.route("/unfollow", methods=["POST"])
 def unfollow():
     data = request.get_json()
     email = data["email"]
-    
+
     User(session["email"]).unfollow_user(email)
     return json.dumps({"status": "success", "message": "Successfully unfollowed user."})
 
-@app.route('/search_users', methods=['POST'])
+@app.route("/search_users", methods=["POST"])
 def search_users():
     data = request.get_json()
     query = data["query"]
@@ -110,12 +110,12 @@ def search_users():
         users = User(session["email"]).find_users_by_name(query)
         return json.dumps({"status": "success", "message": "Successfully searched for user.", "users": users})
 
-@app.route('/get_followers', methods=['GET'])
+@app.route("/get_followers", methods=["GET"])
 def get_followers():
     users = User(session["email"]).get_followers()
     return json.dumps({"status": "success", "message": "Successfully retrieved this users followers.", "users": users})
 
-@app.route('/get_following', methods=['GET'])
+@app.route("/get_following", methods=["GET"])
 def get_following():
     users = User(session["email"]).get_following()
     return json.dumps({"status": "success", "message": "Successfully retrieved the users this user is following.", "users": users})
