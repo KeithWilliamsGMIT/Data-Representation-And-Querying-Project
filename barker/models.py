@@ -34,6 +34,7 @@ class User:
     # Return true if the given password matches the users password
     def verify_password(self, password):
         user = self.find()
+        print("Verify password")
         if user:
             return bcrypt.verify(password, user['password'])
         else:

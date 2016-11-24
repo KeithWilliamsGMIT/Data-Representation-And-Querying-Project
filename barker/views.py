@@ -1,10 +1,9 @@
-from flask import Flask, make_response, request, session
-from models import User
+from flask import Flask, make_response, render_template, request, session
+from .models import User
 import json
 import os
-app = Flask(__name__)
 
-DEBUG_MODE=True
+app = Flask(__name__)
 
 # Found at https://gist.github.com/geoffalday/2021517
 app.secret_key = os.urandom(24)
@@ -20,7 +19,7 @@ app.secret_key = os.urandom(24)
 @app.route("/search")
 def index():
     # make_response does not cache the page
-    return make_response(open("templates/index.html").read())
+    return make_response(render_template("index.html"))
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -119,6 +118,3 @@ def get_followers():
 def get_following():
     users = User(session["email"]).get_following()
     return json.dumps({"status": "success", "message": "Successfully retrieved the users this user is following.", "users": users})
-
-if __name__ == "__main__":
-    app.run(debug=DEBUG_MODE)

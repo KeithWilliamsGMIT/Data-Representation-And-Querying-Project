@@ -103,7 +103,7 @@ Install virtualenv if you don't already have it installed
 pip install virtualenv
 ```
 
-Create and activate a virtual environment called venv
+Create and activate a virtual envronment called venv
 ```
 virtualenv venv
 source venv/bin/activate
@@ -116,8 +116,7 @@ pip install -r requirements.txt
 
 Run the webapp
 ```
-cd webapp
-python webapp.py
+python run.py
 ```
 
 Open [http://localhost:5000](http://localhost:5000) with your web browser.
