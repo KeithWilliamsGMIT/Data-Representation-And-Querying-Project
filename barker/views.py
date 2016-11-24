@@ -1,12 +1,8 @@
 from flask import Flask, make_response, render_template, request, session
 from .models import User
 import json
-import os
 
 app = Flask(__name__)
-
-# Found at https://gist.github.com/geoffalday/2021517
-app.secret_key = os.urandom(24)
 
 # Serve index.html
 # Adapted from https://devcereal.com/setting-flask-angularjs/
