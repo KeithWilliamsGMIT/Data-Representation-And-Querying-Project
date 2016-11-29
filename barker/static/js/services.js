@@ -14,6 +14,7 @@ angular.module ("app.services", [])
                 // Redirect to the feed page if the user successfully registered
                 if (response.data.status == "success") {
                     userData = response.data.user;
+                    setAuthorization(data.email, data.password);
                     $location.path("/feed");
                 } else {
                     Message.setMessage(response.data.message);
@@ -38,6 +39,7 @@ angular.module ("app.services", [])
                 // Redirect to the feed page if the user successfully signed in
                 if (response.data.status == "success") {
                     userData = response.data.user;
+                    setAuthorization(data.email, data.password);
                     $location.path("/feed");
                 } else {
                     Message.setMessage(response.data.message);
@@ -51,6 +53,11 @@ angular.module ("app.services", [])
         );
     }
     
+    // Set the Authorization header for all http requests
+    function setAuthorization(email, password) {
+        $http.defaults.headers.common["Authorization"] = "Basic " + btoa(email + ":" + password);
+    }
+    
     // Send an AJAX request to the server to logout
     function logout() {
         $http.get("/logout")
@@ -58,6 +65,8 @@ angular.module ("app.services", [])
         .then(
             function(response) {
                 console.log("Request successful!");
+                
+                $http.defaults.headers.common["Authorization"] = null;
                 
                 // Clear user data
                 userData = {};
@@ -150,7 +159,8 @@ angular.module ("app.services", [])
 
 .factory("Search", function($http, Connections, Message) {
     var searchData = {
-        users: null
+        users: null,
+        hasResults: false
     }
     
     // Follow a user and set the user at the given index in the list of users to 'following' if the request was successful
@@ -177,6 +187,7 @@ angular.module ("app.services", [])
                 
                 // Store the list of users if the request was successful
                 if (response.data.status == "success") {
+                    searchData.hasResults = true;
                     searchData.users = response.data.users;
                 } else {
                     Message.setMessage(response.data.message);
@@ -194,9 +205,15 @@ angular.module ("app.services", [])
         return searchData.users;
     }
     
+    // Return true if no results were returned from a search
+    function isResultSetEmpty() {
+        return (searchData.hasResults && (searchData.users == null || searchData.users.length == 0));
+    }
+    
     // Reset all variables
     function reset() {
         searchData.users = [];
+        searchData.hasResults = false;
     }
     
     return {
@@ -204,6 +221,7 @@ angular.module ("app.services", [])
         unfollow: unfollow,
         searchUsers: searchUsers,
         getUsers: getUsers,
+        isResultSetEmpty: isResultSetEmpty,
         reset: reset
     }
 })

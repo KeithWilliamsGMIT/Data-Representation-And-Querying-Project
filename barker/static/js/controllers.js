@@ -52,6 +52,7 @@ angular.module ("app.controllers", [])
     $scope.getUsers = Search.getUsers;
     $scope.follow = Search.follow;
     $scope.unfollow = Search.unfollow;
+    $scope.isResultSetEmpty = Search.isResultSetEmpty;
     $scope.getMessage = Message.getMessage;
     $scope.hasMessage = Message.hasMessage;
 });

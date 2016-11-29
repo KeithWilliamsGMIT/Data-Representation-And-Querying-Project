@@ -1,18 +1,25 @@
-<div class="row">
-    <div class="col-md-offset-2 col-md-8">
-        <form id="custom-search-input" class="input-group" ng-submit="searchUsers(search)">
-            <input type="text" class="form-control" placeholder="Search" ng-model="search.query" required/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-offset-2 col-md-8">
+            <form id="custom-search-input" class="input-group" ng-submit="searchUsers(search)">
+                <input type="text" class="form-control" placeholder="Search" ng-model="search.query" required/>
 
-            <span class="input-group-btn">
-                <button class="btn" type="submit">
-                    <i class="glyphicon glyphicon-search"></i>
-                </button>
-            </span>
-        </form>
+                <span class="input-group-btn">
+                    <button class="btn" type="submit">
+                        <i class="glyphicon glyphicon-search"></i>
+                    </button>
+                </span>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- Display search results -->
-<div class="row-fluid margin-top-10" ng-repeat="user in getUsers() track by $index">
-    <users></users>
+    <!-- Show a message if no results were returned from the search -->
+    <div class="user-message" ng-show="isResultSetEmpty()">
+        <span>Sorry, no users were found :(</span>
+    </div>
+
+    <!-- Display search results -->
+    <div class="row-fluid margin-top-10" ng-repeat="user in getUsers() track by $index">
+        <users></users>
+    </div>
 </div>

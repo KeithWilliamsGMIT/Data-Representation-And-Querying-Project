@@ -1,3 +1,38 @@
+html,
+body {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+}
+
+/* Header */
+.navbar {
+    margin-bottom: 0px;
+}
+
+/* Content */
+.container {
+    padding: 1.0em;
+}
+
+/* Background */
+.background {
+    background: url("../img/background-image.jpeg") no-repeat center center fixed #000000;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+/* Login and Sign Up forms */
+.authentication-form {
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+}
+
 /* Search bar */
 #custom-search-input {
     padding: 3px;
@@ -32,9 +67,23 @@
 }
 
 /* Row spacing */
-.margin-top-10 { margin-top: 1.0em; }
+.margin-top-10 {
+    margin-top: 1.0em;
+}
 
 /* Textarea without resize */
 #post-area {
     resize: none;
+}
+
+/* User messages */
+.user-message {
+    width: 100%;
+    text-align: center;
+    margin: 1.0em;
+}
+
+.user-message span {
+    color: #8a8a5c;
+    font-size: 20px;
 }

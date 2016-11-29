@@ -6,9 +6,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <meta charset="utf-8">
         <base href="/">
+        
+        <!-- Favicon -->
+        <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico"/>
+        
+        <!-- Include external files at the end of the body and include the css files first to make the load time appear quicker -->
+        <!-- Bootstrap CSS CDN -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- style.css file -->
+        <link rel="stylesheet" type="text/css" href="/static/css/style.css">
     </head>
 
-    <body>
+    <body background>
         <!-- Navbar adapted from https://getbootstrap.com/components/#navbar -->
         <!-- Added ng-clock to the menu to hide it until the page has loaded to avoid the flicker witnessed by logged out users -->
         <nav class="navbar navbar-default navbar-static-top" role="navigation" ng-controller="headerCtrl">
@@ -50,17 +60,7 @@
         </nav>
         
         <!-- The partials will be displayed inside this div tag -->
-        <div ui-view class="container"></div>
-        
-        <!-- Favicon -->
-        <link rel="shortcut icon" type="image/x-icon" href="/static/img/favicon.ico"/>
-        
-        <!-- Include external files at the end of the body and include the css files first to make the load time appear quicker -->
-        <!-- Bootstrap CSS CDN -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-        <!-- style.css file -->
-        <link rel="stylesheet" type="text/css" href="/static/css/style.css">
+        <div ui-view class="view"></div>
         
         <!-- AngularJS CDN -->
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.js"></script>

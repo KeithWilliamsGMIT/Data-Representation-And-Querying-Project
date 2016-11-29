@@ -56,7 +56,7 @@ Bootstrap allowed me to focus on developing the functionality of the webapp rath
 ###### Server Side
 - Python3 and Flask
 
-Python3 and the Flask microframework were requirements for this project.
+Python3 and the Flask microframework were requirements for this project. Initially I used sessions to save each users state. However, I eventually replaced this with Flask-HTTPAuth which is stateless.
 
 - Neo4J
 
@@ -69,7 +69,9 @@ The following two git repositories were very helpful when deciding how to struct
 
 #### Deployment Stage
 
-##### Setting up Neo4J locally
+##### Running the webapp locally
+
+###### Setting up Neo4J locally
 This webapp requires Neo4J. After you download and start Neo4J set the username and password variables as follows.
 ```
 export NEO4J_USERNAME=username
@@ -89,7 +91,7 @@ dbms.security.auth_enabled=false
 
 Open [http://localhost:7474/browser/](http://localhost:7474/browser/) with your web browser to use the Neo4J GUI.
 
-##### Running the webapp locally
+###### Cloning the repository and running the webapp
 Internet access is required when running the webapp locally as it uses a number of files from different CDN's.
 
 Clone the repository
@@ -120,3 +122,15 @@ python run.py
 ```
 
 Open [http://localhost:5000](http://localhost:5000) with your web browser.
+
+##### Running the webapp remotely
+I deployed the webapp using Heroku, which was one of the goals outlined at the beginning of this project. The URL for the webapp is [https://g00324844-data-rep-project.herokuapp.com/](https://g00324844-data-rep-project.herokuapp.com/).
+
+The database is hosted using GrapheneDB. The free plan allows 1k nodes and 10k relationships. When using the Neo4j Community Edition 3.0.7 on GrapheneDB I experienced a Connection Timeout error when querying the database even though I was successfully able to query it using cURL. As a workaround I downgraded to the 2.3.7 edition.
+
+#### Conclusion
+If I were to do this project again there are a few things I would do differently.
+
+I would spend more time upfront researching different technologies before starting development. The lack of this lead to some time consuming problems during the development phase of this project such as replacing angular-route with angular-ui-router.
+
+I would also involve git and GitHub more throughout the project. I would commit the project more frequently and also make use of GitHub's features such as issues, labels and milestones. However, I feel that this was not a major issue as I was not working on this project as part of a team and it was relatively easy to manage the it without these tools.
