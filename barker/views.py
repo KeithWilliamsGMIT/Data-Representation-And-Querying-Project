@@ -24,11 +24,11 @@ def unauthorized():
 @app.route("/")
 @app.route("/login")
 @app.route("/feed")
-@app.route("/profile/posts")
-@app.route("/profile/followers")
-@app.route("/profile/following")
+@app.route("/profile/<username>/posts")
+@app.route("/profile/<username>/followers")
+@app.route("/profile/<username>/following")
 @app.route("/search")
-def index():
+def index(**kwargs):
     # make_response does not cache the page
     return make_response(render_template("index.html"))
 
@@ -50,7 +50,7 @@ def register():
         return json.dumps({"status": "error", "message": "That email address was already registered."})
     else:
         verify_password(email, password)
-        return json.dumps({"status": "success", "message": "User successfully registered.", "user": {"email": email}})
+        return json.dumps({"status": "success", "message": "User successfully registered.", "user": {"email": email, "username": g.user.get_username()}})
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -61,38 +61,32 @@ def login():
     if not verify_password(email, password):
         return json.dumps({"status": "error", "message": "Invalid login."})
     else:
-        return json.dumps({"status": "success", "message": "User successfully logged in.", "user": {"email": email}})
+        return json.dumps({"status": "success", "message": "User successfully logged in.", "user": {"email": email, "username": g.user.get_username()}})
 
-@app.route("/logout" , methods=["GET"])
+@app.route("/posts", methods=["GET", "POST"])
 @auth.login_required
-def logout():
-    return json.dumps({"status": "success", "message": "User successfully logged out."})
+def posts():
+    if request.method == "GET":
+        timestamp = float(request.values["timestamp"])
+        skip = int(request.values["skip"])
+        
+        posts = User(g.user.email).get_posts(timestamp, skip)
+        return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
+    
+    elif request.method == "POST":
+        data = request.get_json()
+        text = data["text"]
 
-@app.route("/add_post", methods=["POST"])
+        if not text:
+            return json.dumps({"status": "error", "message": "The post was empty."})
+        else:
+            User(g.user.email).add_post(text)
+            return json.dumps({"status": "success", "message": "Successfully added post."})
+
+@app.route("/<username>/get_users_posts", methods=["GET"])
 @auth.login_required
-def add_post():
-    data = request.get_json()
-    text = data["text"]
-
-    if not text:
-        return json.dumps({"status": "error", "message": "The post was empty."})
-    else:
-        User(g.user.email).add_post(text)
-        return json.dumps({"status": "success", "message": "Successfully added post."})
-
-@app.route("/get_own_posts", methods=["GET"])
-@auth.login_required
-def get_own_posts():
-    posts = User(g.user.email).get_own_posts()
-    return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
-
-@app.route("/get_all_recent_posts", methods=["POST"])
-@auth.login_required
-def get_all_recent_posts():
-    data = request.get_json()
-    timestamp = data["timestamp"]
-
-    posts = User(g.user.email).get_all_recent_posts(timestamp)
+def get_users_posts(username):
+    posts = User(g.user.email).get_users_posts(username)
     return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
 
 @app.route("/follow", methods=["POST"])
@@ -113,11 +107,10 @@ def unfollow():
     User(g.user.email).unfollow_user(email)
     return json.dumps({"status": "success", "message": "Successfully unfollowed user."})
 
-@app.route("/search_users", methods=["POST"])
+@app.route("/search_users", methods=["GET"])
 @auth.login_required
 def search_users():
-    data = request.get_json()
-    query = data["query"]
+    query = request.values["query"]
 
     if not query:
         return json.dumps({"status": "error", "message": "The search query was empty."})
@@ -125,14 +118,14 @@ def search_users():
         users = User(g.user.email).find_users_by_name(query)
         return json.dumps({"status": "success", "message": "Successfully searched for user.", "users": users})
 
-@app.route("/get_followers", methods=["GET"])
+@app.route("/<username>/get_followers", methods=["GET"])
 @auth.login_required
-def get_followers():
-    users = User(g.user.email).get_followers()
+def get_followers(username):
+    users = User(g.user.email).get_followers(username)
     return json.dumps({"status": "success", "message": "Successfully retrieved this users followers.", "users": users})
 
-@app.route("/get_following", methods=["GET"])
+@app.route("/<username>/get_following", methods=["GET"])
 @auth.login_required
-def get_following():
-    users = User(g.user.email).get_following()
+def get_following(username):
+    users = User(g.user.email).get_following(username)
     return json.dumps({"status": "success", "message": "Successfully retrieved the users this user is following.", "users": users})

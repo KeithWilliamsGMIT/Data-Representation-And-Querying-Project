@@ -60,30 +60,24 @@ angular.module ("app.services", [])
     
     // Send an AJAX request to the server to logout
     function logout() {
-        $http.get("/logout")
+        // Remove Authentication header
+        $http.defaults.headers.common["Authorization"] = null;
         
-        .then(
-            function(response) {
-                console.log("Request successful!");
-                
-                $http.defaults.headers.common["Authorization"] = null;
-                
-                // Clear user data
-                userData = {};
-                
-                // Redirect to the login page
-                $location.path("/login");
-            },
+        // Clear user data
+        userData = {};
 
-            function(response) {
-                console.log("Request failed!\n" + JSON.stringify(response));
-            }
-        );
+        // Redirect to the login page
+        $location.path("/login");
     }
     
     // Return true if the user is logged in (userData is not an empty object)
     function isLoggedIn() {
         return !angular.equals({}, userData);
+    }
+    
+    // Return the users username
+    function getUsername() {
+        return userData.username;
     }
     
     // Reset all variables
@@ -95,13 +89,16 @@ angular.module ("app.services", [])
         register: register,
         login: login,
         logout: logout,
-        isLoggedIn: isLoggedIn
+        isLoggedIn: isLoggedIn,
+        getUsername: getUsername,
     }
 })
 
-.factory("Feed", function(Posts) {
+.factory("Feed", function($interval, Posts) {
     var feedData = {
-        posts: []
+        posts: [],
+        hiddenPosts: [],
+        busy: false
     }
     
     // Add a new post it to the database
@@ -112,31 +109,12 @@ angular.module ("app.services", [])
     }
     
     // Get all recent posts written by the current user and who they follow
-    // Add the posts to the beginning of the list if the request was successful
     function getAllRecentPosts() {
-        // Get the timestamp of the most recent post
-        // If there are no posts set the timestamp to 0
-        if (feedData.posts.length > 0) {
-            timestamp = feedData.posts[0].timestamp;
-        } else {
-            timestamp = 0;
-        }
-        
-        Posts.getAllRecentPosts(timestamp, function(posts) {
-            if (feedData.posts.length == 0) {
-                // If there are no posts already, simply store the response
-                feedData.posts = posts;
-            } else {
-                // If there are posts previously requested it would be wasteful to request them a second time.
-                // Instead, retrieve te posts that were made since the timestamp of the most recent post.
-                // Add the posts to the start of list of posts.
-                // Looping through the posts in the response and using the unshift method are both O(n) operations.
-                // This might lead to performance problems if theres a lot of posts in the reponse,
-                // or if there's a lot of posts that have to be shifted.
-                for (var i = posts.length - 1; i >= 0; --i) {
-                    feedData.posts.unshift(posts[i]);
-                }
-            }
+        feedData.busy = true;
+        showHiddenPosts();
+        getRecentPosts(function(posts) {
+            feedData.posts = joinPosts(feedData.posts, posts);
+            feedData.busy = false;
         });
     }
     
@@ -145,14 +123,88 @@ angular.module ("app.services", [])
         return feedData.posts;
     }
     
+    // Load old posts, skip the posts that are already loaded
+    // Only send one ajax request at a time
+    function getOldPosts() {
+        if (!feedData.busy && feedData.posts.length > 0) {
+            feedData.busy = true;
+
+            getRecentPosts(function(posts) {
+                feedData.hiddenPosts = joinPosts(posts, feedData.hiddenPosts);
+                
+                var totalPosts = feedData.posts.length + feedData.hiddenPosts.length;
+
+                Posts.getPosts(0, totalPosts, function(posts) {
+                    feedData.posts = joinPosts(posts, feedData.posts);
+                    feedData.busy = false;
+                });
+            });
+        }
+    }
+    
+    // Get all recent posts but don't show them to the user
+    function getAndHideRecentPosts() {
+        getRecentPosts(function(posts) {
+            feedData.hiddenPosts = joinPosts(posts, feedData.hiddenPosts);
+        });
+    }
+    
+    // Join one list of posts to another
+    function joinPosts(posts, list) {
+        if (list.length == 0) {
+            // If there are no posts already, simply store the response
+            list = posts;
+        } else {
+            list = list.concat(posts);
+        }
+        
+        return list;
+    }
+    
+    // Add the posts to the beginning of the list if the request was successful
+    function getRecentPosts(callback) {
+        var timestamp;
+        
+        // Get the timestamp of the most recent post
+        // If there are no posts set the timestamp to 0
+        if (feedData.hiddenPosts.length > 0) {
+            timestamp = feedData.hiddenPosts[0].timestamp;
+        } else if (feedData.posts.length > 0) {
+            timestamp = feedData.posts[0].timestamp;
+        } else {
+            timestamp = 0;
+        }
+        
+        Posts.getPosts(timestamp, 0, callback);
+    }
+        
+    // Show hidden posts
+    function showHiddenPosts() {
+        feedData.posts = feedData.hiddenPosts.concat(feedData.posts);
+        feedData.hiddenPosts = [];
+    }
+    
+    // Return true if there are hidden posts to be shown to the user
+    function hasHiddenPosts() {
+        return (feedData.hiddenPosts.length > 0);
+    }
+    
     // Reset all variables
     function reset() {
         getAllRecentPosts();
+        
+        // Invoke getAndHideRecentPosts() every minute
+        $interval(function() {
+            getAndHideRecentPosts();
+        }, 60000);
     }
     
     return {
         addPost: addPost,
         getFeed: getFeed,
+        getOldPosts: getOldPosts,
+        showHiddenPosts: showHiddenPosts,
+        hasHiddenPosts: hasHiddenPosts,
         reset: reset
     }
 })
@@ -179,7 +231,7 @@ angular.module ("app.services", [])
     
     // Get a list of users that match the given query
     function searchUsers(data) {
-        $http.post("/search_users", data)
+        $http.get("/search_users?query=" + data.query)
         
         .then(
             function(response) {
@@ -232,18 +284,18 @@ angular.module ("app.services", [])
     }
     
     // Return te list of posts written by the current user
-    function getMyPosts () {
+    function getUserPosts () {
         return profileData.myPosts;
     }
     
-    function reset() {
-        Posts.getOwnPosts(function(posts) {
+    function reset(username) {
+        Posts.getUserPosts(username, function(posts) {
             profileData.myPosts = posts;
         });
     }
     
     return {
-        getMyPosts: getMyPosts,
+        getUserPosts: getUserPosts,
         reset: reset
     }
 })
@@ -278,8 +330,8 @@ angular.module ("app.services", [])
         return followersData.followers.length;
     }
     
-    function reset() {
-        Connections.getFollowers(function(followers) {
+    function reset(username) {
+        Connections.getFollowers(username, function(followers) {
             followersData.followers = followers;
         });
     }
@@ -317,8 +369,8 @@ angular.module ("app.services", [])
         return followingData.following.length;
     }
     
-    function reset() {
-        Connections.getFollowing(function(following) {
+    function reset(username) {
+        Connections.getFollowing(username, function(following) {
             followingData.following = following;
         });
     }
@@ -335,7 +387,7 @@ angular.module ("app.services", [])
 .factory("Posts", function($http, Message) {
     // Send an AJAX request to the server to add a new post
     function addPost(data, successCallback) {
-        $http.post("/add_post", data)
+        $http.post("/posts", data)
         
         .then(
             function(response) {
@@ -356,8 +408,8 @@ angular.module ("app.services", [])
     }
     
     // Get all posts written by the current user
-    function getOwnPosts(successCallback) {
-        $http.get("/get_own_posts")
+    function getUserPosts(username, successCallback) {
+        $http.get("/" + username + "/get_users_posts")
         
         .then(
             function(response) {
@@ -378,13 +430,13 @@ angular.module ("app.services", [])
         );
     }
     
-    // Get all recent posts written by the current user and who they follow
-    function getAllRecentPosts(timestamp, successCallback) {
+    // Get posts written by the current user and who they follow
+    function getPosts(timestamp, skip, successCallback) {
         var data = {
             timestamp: timestamp
         }
         
-        $http.post("/get_all_recent_posts", data)
+        $http.get("/posts?timestamp=" + timestamp + "&skip=" + skip)
         
         .then(
             function(response) {
@@ -406,8 +458,8 @@ angular.module ("app.services", [])
     
     return {
         addPost: addPost,
-        getOwnPosts: getOwnPosts,
-        getAllRecentPosts: getAllRecentPosts
+        getUserPosts: getUserPosts,
+        getPosts: getPosts
     }
 })
 
@@ -459,8 +511,8 @@ angular.module ("app.services", [])
     
     // Retrieve a list of the users that follow the current user
     // If the request was successful call the successCallback
-    function getFollowers(successCallback) {
-        $http.get("/get_followers")
+    function getFollowers(username, successCallback) {
+        $http.get("/" + username + "/get_followers")
         
         .then(
             function(response) {
@@ -482,8 +534,8 @@ angular.module ("app.services", [])
     
     // Retrieve a list of the users that the current user follows
     // If the request was successful call the successCallback
-    function getFollowing(successCallback) {
-        $http.get("/get_following")
+    function getFollowing(username, successCallback) {
+        $http.get("/" + username + "/get_following")
         
         .then(
             function(response) {

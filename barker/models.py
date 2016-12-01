@@ -2,6 +2,7 @@ from py2neo import Graph, Node, Relationship
 from passlib.hash import bcrypt
 from datetime import datetime
 import os
+import random
 
 # Get environmental variables need to connect to Neo4J database
 url = os.environ.get('GRAPHENEDB_URL', 'http://localhost:7474')
@@ -25,7 +26,8 @@ class User:
     # Register a new user if they don't already exist
     def register(self, name, password):
         if not self.find():
-            user = Node('User', name=name, email=self.email, password=bcrypt.encrypt(password))
+            username = generate_username(name)
+            user = Node('User', name=name, username=username, email=self.email, password=bcrypt.encrypt(password))
             graph.create(user)
             return True
         else:
@@ -40,6 +42,21 @@ class User:
         else:
             return False
     
+    # Return the username for this user
+    def get_username(self):
+        query = '''
+        MATCH (self:User)
+        WHERE self.email = {self}
+        RETURN self.username AS username
+        LIMIT 1
+        '''
+        
+        # Dictionary of parameters for the query
+        params = {'self': self.email}
+        
+        # Return a list of dictionaries which can be converted to JSON
+        return graph.data(query, params)[0].get('username')
+    
     # Add the post to the database
     def add_post(self, text):
         user = self.find()
@@ -47,34 +64,35 @@ class User:
         rel = Relationship(user, 'POSTED', post)
         graph.create(rel)
     
-    # Return all posts written by the current user
-    def get_own_posts(self):
+    # Return all posts written by the user with the given username
+    def get_users_posts(self, username):
         query = '''
         MATCH (self:User)-[:POSTED]->(post:Post)
-        WHERE self.email = {self}
-        RETURN post.text AS message, post.timestamp AS timestamp, self.name AS name
+        WHERE self.username = {self}
+        RETURN post.text AS message, post.timestamp AS timestamp, self.name AS name, self.username AS username
         ORDER BY post.timestamp DESC
         LIMIT 20
         '''
         
         # Dictionary of parameters for the query
-        params = {'self': self.email}
+        params = {'self': username}
         
         # Return a list of dictionaries which can be converted to JSON
         return graph.data(query, params)
     
-    # Return recent posts written by the current user and who they follow
-    def get_all_recent_posts(self, timestamp):
+    # Return posts written by the current user and who they follow
+    def get_posts(self, timestamp, skip):
         query = '''
         MATCH (self:User)-[:FOLLOWED*0..1]->(user)-[:POSTED]->(post)
         WHERE self.email = {self} AND post.timestamp > {timestamp}
-        RETURN post.text AS message, post.timestamp AS timestamp, user.name AS name
+        RETURN post.text AS message, post.timestamp AS timestamp, user.name AS name, user.username AS username
         ORDER BY post.timestamp DESC
+        SKIP {skip}
         LIMIT 20;
         '''
         
         # Dictionary of parameters for the query
-        params = {'self': self.email, 'timestamp': timestamp}
+        params = {'self': self.email, 'timestamp': timestamp, 'skip': skip}
         
         # Return a list of dictionaries which can be converted to JSON
         return graph.data(query, params)
@@ -110,7 +128,7 @@ class User:
         WHERE user.email <> {email} AND user.name =~ {name}
         OPTIONAL MATCH (self)-[r:FOLLOWED]->(user)
         WHERE self.email = {email}
-        RETURN user.name AS name, user.email AS email, r IS NOT NULL AS following;
+        RETURN user.name AS name, user.email AS email, user.username AS username, r IS NOT NULL AS following;
         '''
         
         # Dictionary of parameters for the query
@@ -120,34 +138,53 @@ class User:
         return graph.data(query, params)
     
     # Get all the users that follow the current user
-    def get_followers(self):
+    def get_followers(self, username):
         query = '''
         MATCH (user:User)-[:FOLLOWED]->(self:User)
-        WHERE self.email = {self}
-        OPTIONAL MATCH (self:User)-[r:FOLLOWED]->(user:User)
-        RETURN user.name AS name, user.email AS email, r IS NOT NULL AS following;
+        WHERE self.username = {self}
+        OPTIONAL MATCH (me:User)-[r:FOLLOWED]->(user:User)
+        WHERE me.email = {me}
+        RETURN user.name AS name, user.email AS email, user.username AS username, r IS NOT NULL AS following;
         '''
         
         # Dictionary of parameters for the query
-        params = {'self': self.email}
+        params = {'self': username, 'me': self.email}
         
         # Run the query
         return graph.data(query, params)
     
      # Get all the users that the current user follows
-    def get_following(self):
+    def get_following(self, username):
         query = '''
         MATCH (self:User)-[FOLLOWED]->(user:User)
-        WHERE self.email = {self}
-        RETURN user.name AS name, user.email AS email, true AS following;
+        WHERE self.username = {self}
+        OPTIONAL MATCH (me:User)-[r:FOLLOWED]->(user:User)
+        WHERE me.email = {me}
+        RETURN user.name AS name, user.email AS email, user.username AS username, r IS NOT NULL AS following;
         '''
         
         # Dictionary of parameters for the query
-        params = {'self': self.email}
+        params = {'self': username, 'me': self.email}
         
         # Run the query
         return graph.data(query, params)
 
+# Generate a random username based on the users full name
+# Adapted from http://stackoverflow.com/questions/35964691/generating-username-using-python
+def generate_username(name):
+    while (True):
+        # Generate a username
+        first = name[0][0]
+        surname = name[-1][:3].rjust(3, 'x')
+        number = '{:03d}'.format(random.randrange (1,999))
+        username = '{}{}{}'.format(first, surname, number)
+
+        # Check if it is unique
+        user = graph.find_one('User', 'username', username)
+
+        if (user is None):
+            return username
+    
 # Return a timestamp in seconds
 def timestamp():
     epoch = datetime.utcfromtimestamp(0)

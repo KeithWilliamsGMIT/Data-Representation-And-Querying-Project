@@ -1,4 +1,9 @@
 <div class="container">
+    <!-- Button to show hidden posts -->
+    <form ng-show="hasHiddenPosts()" ng-submit="showHiddenPosts()">
+        <input class="btn btn-success btn-block" type="submit" value="Load New Messages">
+    </form>
+    
     <!-- Textbox for writing posts -->
     <div class="panel panel-default">
         <div class="panel-body">
@@ -18,5 +23,5 @@
     </div>
 
     <!-- Display posts here -->
-    <posts></posts>
+    <posts infinite-scroll="getOldPosts()" infinite-scroll-distance="0.2"></posts>
 </div>

@@ -3,6 +3,7 @@ angular.module ("app.controllers", [])
 .controller("headerCtrl", function($scope, User) {
     $scope.logout = User.logout;
     $scope.isLoggedIn = User.isLoggedIn;
+    $scope.getUsername = User.getUsername;
 })
 
 .controller("signUpCtrl", function($scope, User, Message) {
@@ -17,7 +18,10 @@ angular.module ("app.controllers", [])
     $scope.hasMessage = Message.hasMessage;
 })
 
-.controller("feedCtrl", function($scope, Feed, Message) {
+.controller("feedCtrl", function($scope, $window, Feed, Message) {
+    // Scroll to the top when of the page
+    $window.scrollTo(0, 0);
+    
     // Clear the post box when the form is submitted
     function addPost(data) {
         Feed.addPost(angular.copy(data));
@@ -26,12 +30,15 @@ angular.module ("app.controllers", [])
     
     $scope.addPost = addPost;
     $scope.getFeed = Feed.getFeed;
+    $scope.getOldPosts = Feed.getOldPosts;
+    $scope.hasHiddenPosts = Feed.hasHiddenPosts;
+    $scope.showHiddenPosts = Feed.showHiddenPosts;
     $scope.getMessage = Message.getMessage;
     $scope.hasMessage = Message.hasMessage;
 })
 
 .controller("profilePostsCtrl", function($scope, Profile) {
-    $scope.getFeed = Profile.getMyPosts;
+    $scope.getFeed = Profile.getUserPosts;
 })
 
 .controller("profileFollowersCtrl", function($scope, Followers) {

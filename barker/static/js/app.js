@@ -1,4 +1,4 @@
-angular.module("app", ["app.directives", "app.controllers", "app.services", "ui.router"])
+angular.module("app", ["app.directives", "app.controllers", "app.services", "ui.router", "infinite-scroll"])
 
 // Adapted from https://devcereal.com/setting-flask-angularjs/
 // Declare the URL routes for the webapp
@@ -28,13 +28,13 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ui.
     
     .state("profile", {
         title: "Profile",
-        url: "/profile",
+        url: "/profile/:username",
         templateUrl: "/static/partials/profile.html"
     })
     
-    .state("profile.posts", {
+    .state('profile.posts', {
         title: "Profile",
-        url: "/posts",
+        url: '/posts',
         templateUrl: "/static/partials/widgets/posts.html",
         controller: "profilePostsCtrl"
     })
@@ -58,7 +58,7 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ui.
         url: "/search",
         templateUrl: "/static/partials/search.html",
         controller: "searchCtrl"
-    })
+    });
     
     // Default to the sign up page
     $urlRouterProvider.otherwise("/");
@@ -68,7 +68,7 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ui.
     $locationProvider.html5Mode(true);
 })
 
-.run(function($rootScope, $state, $stateParams, $location, User, Feed, Profile, Followers, Following, Search, Message) {
+.run(function($rootScope, $state, $stateParams, $stateParams, $location, User, Feed, Profile, Followers, Following, Search, Message) {
     $rootScope.title = $state.current.title;
     
     // Redirect to the login page if the user is not logged in and is not on the sign up page
@@ -88,11 +88,11 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ui.
         if (current.name == "feed") {
             Feed.reset();
         } else if (current.name == "profile.posts") {
-            Profile.reset();
+            Profile.reset($stateParams.username);
         } else if (current.name == "profile.followers") {
-            Followers.reset();
+            Followers.reset($stateParams.username);
         } else if (current.name == "profile.following") {
-            Following.reset();
+            Following.reset($stateParams.username);
         } else if (current.name == "search") {
             Search.reset();
         }

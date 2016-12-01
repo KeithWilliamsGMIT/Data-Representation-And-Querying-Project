@@ -1,8 +1,7 @@
 <div class="col-sm-4">
     <div class="panel panel-default">
         <div class="panel-body">
-            <h4 ng-bind="user.name"></h4>
-            <h5 ng-bind="user.email"></h5>
+            <span ng-bind="user.name"></span> (<a ui-sref="profile.posts({ username: user.username })">{{user.username}}</a>)
 
             <!-- Follow button -->
             <form ng-hide="user.following" ng-submit="follow(user, $index)">

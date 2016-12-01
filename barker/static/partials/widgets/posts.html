@@ -2,7 +2,7 @@
 <div ng-repeat="post in getFeed() track by $index">
     <div class="panel panel-default">
         <div class="panel-body">
-            <h6 ng-bind="post.name"></h6>
+            <span ng-bind="post.name"></span> (<a ui-sref="profile.posts({ username: post.username })">{{post.username}}</a>)
             <p ng-bind="post.message"></p>
         </div>
     </div>

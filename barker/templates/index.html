@@ -49,7 +49,7 @@
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
                             <ul class="dropdown-menu">
-                                <li><a ui-sref="profile.posts">Profile</a></li>
+                                <li><a ui-sref="profile.posts({ username: getUsername() })">Profile</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a ng-click="logout()">Logout</a></li>
                             </ul>
@@ -63,8 +63,9 @@
         <div ui-view class="view"></div>
         
         <!-- AngularJS CDN -->
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.2/angular-ui-router.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ngInfiniteScroll/1.3.0/ng-infinite-scroll.min.js"></script>
         
         <!-- JS Files -->
         <script src="/static/js/app.js"></script>
