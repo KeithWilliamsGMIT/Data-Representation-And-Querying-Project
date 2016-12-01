@@ -76,6 +76,11 @@ angular.module("app", ["app.directives", "app.controllers", "app.services", "ui.
         $location.path("/login");
     }
     
+    // Logout if the user goes back to the login or signup page
+    if ($location.path() == "/login" && $location.path() == "/") {
+        User.logout();
+    }
+    
     $rootScope.$on("$stateChangeSuccess", function (event, current, previous) {
         // clear any messages when the route changes
         Message.clearMessage();

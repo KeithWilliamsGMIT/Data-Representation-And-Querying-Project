@@ -38,14 +38,11 @@ def register():
     name = data["name"]
     email = data["email"]
     password = data["password"]
-    re_enter_password = data["reEnterPassword"]
 
     if len(name) < 1:
         return json.dumps({"status": "error", "message": "Your name must be at least one character."})
     elif len(password) < 8:
         return json.dumps({"status": "error", "message": "Your password must be at least 8 characters."})
-    elif password != re_enter_password:
-        return json.dumps({"status": "error", "message": "The passwords you entered did not match."})
     elif not User(email).register(name, password):
         return json.dumps({"status": "error", "message": "That email address was already registered."})
     else:
@@ -89,24 +86,6 @@ def get_users_posts(username):
     posts = User(g.user.email).get_users_posts(username)
     return json.dumps({"status": "success", "message": "Posts retrieved successfully.", "posts": posts})
 
-@app.route("/follow", methods=["POST"])
-@auth.login_required
-def follow():
-    data = request.get_json()
-    email = data["email"]
-
-    User(g.user.email).follow_user(email)
-    return json.dumps({"status": "success", "message": "Successfully followed user."})
-
-@app.route("/unfollow", methods=["POST"])
-@auth.login_required
-def unfollow():
-    data = request.get_json()
-    email = data["email"]
-
-    User(g.user.email).unfollow_user(email)
-    return json.dumps({"status": "success", "message": "Successfully unfollowed user."})
-
 @app.route("/search_users", methods=["GET"])
 @auth.login_required
 def search_users():
@@ -118,14 +97,32 @@ def search_users():
         users = User(g.user.email).find_users_by_name(query)
         return json.dumps({"status": "success", "message": "Successfully searched for user.", "users": users})
 
-@app.route("/<username>/get_followers", methods=["GET"])
+@app.route("/followers", methods=["GET"])
 @auth.login_required
-def get_followers(username):
+def followers():
+    username = request.values["username"]
     users = User(g.user.email).get_followers(username)
     return json.dumps({"status": "success", "message": "Successfully retrieved this users followers.", "users": users})
 
-@app.route("/<username>/get_following", methods=["GET"])
+@app.route("/following", methods=["GET", "POST", "DELETE"])
 @auth.login_required
-def get_following(username):
-    users = User(g.user.email).get_following(username)
-    return json.dumps({"status": "success", "message": "Successfully retrieved the users this user is following.", "users": users})
+def following():
+    # Get followers
+    if request.method == "GET":
+        username = request.values["username"]
+        users = User(g.user.email).get_following(username)
+        return json.dumps({"status": "success", "message": "Successfully retrieved the users this user is following.", "users": users})
+    
+    # Follow
+    if request.method == "POST":
+        data = request.get_json()
+        email = data["email"]
+
+        User(g.user.email).follow_user(email)
+        return json.dumps({"status": "success", "message": "Successfully followed user."})
+    
+    # Unfollow
+    if request.method == "DELETE":
+        email = username = request.values["email"]
+        User(g.user.email).unfollow_user(email)
+        return json.dumps({"status": "success", "message": "Successfully unfollowed user."})

@@ -5,27 +5,32 @@ angular.module ("app.services", [])
     
     // Send an AJAX request to the server to register a new user
     function register(data) {
-        $http.post("/register", data)
         
-        .then(
-            function(response) {
-                console.log("Request successful!");
-                
-                // Redirect to the feed page if the user successfully registered
-                if (response.data.status == "success") {
-                    userData = response.data.user;
-                    setAuthorization(data.email, data.password);
-                    $location.path("/feed");
-                } else {
-                    Message.setMessage(response.data.message);
-                    console.log("Error Message: " + Message.getMessage());
-                }
-            },
+        if (data.password == data.reEnterPassword) {
+            $http.post("/register", data)
 
-            function(response) {
-                console.log("Request failed!\n" + JSON.stringify(response));
-            }
-        );
+            .then(
+                function(response) {
+                    console.log("Request successful!");
+
+                    // Redirect to the feed page if the user successfully registered
+                    if (response.data.status == "success") {
+                        userData = response.data.user;
+                        setAuthorization(data.email, data.password);
+                        $location.path("/feed");
+                    } else {
+                        Message.setMessage(response.data.message);
+                        console.log("Error Message: " + Message.getMessage());
+                    }
+                },
+
+                function(response) {
+                    console.log("Request failed!\n" + JSON.stringify(response));
+                }
+            );
+        } else {
+            Message.setMessage("The passwords you entered did not match.");
+        }
     }
     
     // Send an AJAX request to the server to login
@@ -72,7 +77,7 @@ angular.module ("app.services", [])
     
     // Return true if the user is logged in (userData is not an empty object)
     function isLoggedIn() {
-        return !angular.equals({}, userData);
+        return $http.defaults.headers.common["Authorization"] != null;
     }
     
     // Return the users username
@@ -110,11 +115,10 @@ angular.module ("app.services", [])
     
     // Get all recent posts written by the current user and who they follow
     function getAllRecentPosts() {
-        feedData.busy = true;
         showHiddenPosts();
         getRecentPosts(function(posts) {
-            feedData.posts = joinPosts(feedData.posts, posts);
-            feedData.busy = false;
+            feedData.hiddenPosts = joinPosts(feedData.hiddenPosts, posts);
+            showHiddenPosts();
         });
     }
     
@@ -176,6 +180,7 @@ angular.module ("app.services", [])
         }
         
         Posts.getPosts(timestamp, 0, callback);
+        
     }
         
     // Show hidden posts
@@ -467,7 +472,7 @@ angular.module ("app.services", [])
 .factory("Connections", function($http, Message) {
     // Follow a user and call the successCallback if the request was successful
     function follow(data, successCallback) {
-        $http.post("/follow", data)
+        $http.post("/following", data)
         
         .then(
             function(response) {
@@ -489,7 +494,7 @@ angular.module ("app.services", [])
     
     // Unfollow a user and call the successCallback if the request was successful
     function unfollow(data, successCallback) {
-        $http.post("/unfollow", data)
+        $http.delete("/following?email=" + data.email)
         
         .then(
             function(response) {
@@ -512,7 +517,7 @@ angular.module ("app.services", [])
     // Retrieve a list of the users that follow the current user
     // If the request was successful call the successCallback
     function getFollowers(username, successCallback) {
-        $http.get("/" + username + "/get_followers")
+        $http.get("/followers?username=" + username)
         
         .then(
             function(response) {
@@ -535,7 +540,7 @@ angular.module ("app.services", [])
     // Retrieve a list of the users that the current user follows
     // If the request was successful call the successCallback
     function getFollowing(username, successCallback) {
-        $http.get("/" + username + "/get_following")
+        $http.get("/following?username=" + username)
         
         .then(
             function(response) {

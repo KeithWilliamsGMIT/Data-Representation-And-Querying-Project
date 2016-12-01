@@ -4,3 +4,4 @@ from .models import graph
 
 # Initialise uniqueness constraints in the database
 #graph.schema.create_uniqueness_constraint("User", "email")
+#graph.schema.create_uniqueness_constraint("User", "username")
