@@ -31,8 +31,8 @@ angular.module ("app.controllers", [])
     $scope.addPost = addPost;
     $scope.getFeed = Feed.getFeed;
     $scope.getOldPosts = Feed.getOldPosts;
-    $scope.hasHiddenPosts = Feed.hasHiddenPosts;
-    $scope.showHiddenPosts = Feed.showHiddenPosts;
+    $scope.hasNewPosts = Feed.hasNewPosts;
+    $scope.getAllRecentPosts = Feed.getAllRecentPosts;
     $scope.getMessage = Message.getMessage;
     $scope.hasMessage = Message.hasMessage;
 })

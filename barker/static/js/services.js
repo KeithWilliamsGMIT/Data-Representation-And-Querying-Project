@@ -102,7 +102,7 @@ angular.module ("app.services", [])
 .factory("Feed", function($interval, Posts) {
     var feedData = {
         posts: [],
-        hiddenPosts: [],
+        hasNewPosts: false,
         busy: false
     }
     
@@ -115,10 +115,9 @@ angular.module ("app.services", [])
     
     // Get all recent posts written by the current user and who they follow
     function getAllRecentPosts() {
-        showHiddenPosts();
         getRecentPosts(function(posts) {
-            feedData.hiddenPosts = joinPosts(feedData.hiddenPosts, posts);
-            showHiddenPosts();
+            feedData.posts = posts.concat(feedData.posts);
+            feedData.hasNewPosts = false;
         });
     }
     
@@ -134,73 +133,51 @@ angular.module ("app.services", [])
             feedData.busy = true;
 
             getRecentPosts(function(posts) {
-                feedData.hiddenPosts = joinPosts(posts, feedData.hiddenPosts);
-                
-                var totalPosts = feedData.posts.length + feedData.hiddenPosts.length;
+                var totalPosts = feedData.posts.length + posts.length;
 
                 Posts.getPosts(0, totalPosts, function(posts) {
-                    feedData.posts = joinPosts(posts, feedData.posts);
+                    feedData.posts = feedData.posts.concat(posts);
                     feedData.busy = false;
                 });
             });
         }
     }
     
-    // Get all recent posts but don't show them to the user
-    function getAndHideRecentPosts() {
-        getRecentPosts(function(posts) {
-            feedData.hiddenPosts = joinPosts(posts, feedData.hiddenPosts);
-        });
-    }
-    
-    // Join one list of posts to another
-    function joinPosts(posts, list) {
-        if (list.length == 0) {
-            // If there are no posts already, simply store the response
-            list = posts;
-        } else {
-            list = list.concat(posts);
-        }
-        
-        return list;
-    }
-    
     // Add the posts to the beginning of the list if the request was successful
     function getRecentPosts(callback) {
-        var timestamp;
+        var timestamp = 0;
         
         // Get the timestamp of the most recent post
         // If there are no posts set the timestamp to 0
-        if (feedData.hiddenPosts.length > 0) {
-            timestamp = feedData.hiddenPosts[0].timestamp;
-        } else if (feedData.posts.length > 0) {
+        if (feedData.posts.length > 0) {
             timestamp = feedData.posts[0].timestamp;
-        } else {
-            timestamp = 0;
         }
         
         Posts.getPosts(timestamp, 0, callback);
-        
-    }
-        
-    // Show hidden posts
-    function showHiddenPosts() {
-        feedData.posts = feedData.hiddenPosts.concat(feedData.posts);
-        feedData.hiddenPosts = [];
     }
     
-    // Return true if there are hidden posts to be shown to the user
-    function hasHiddenPosts() {
-        return (feedData.hiddenPosts.length > 0);
+    // Check for new posts
+    function checkForNewPosts() {
+        getRecentPosts(function(posts) {
+            feedData.hasNewPosts = posts.length > 0;
+        });
+    }     
+    
+    // Return true if there are posts posts to be shown to the user
+    function hasNewPosts() {
+        return feedData.hasNewPosts;
     }
     
     // Reset all variables
     function reset() {
+        feedData.posts = [];
+        feedData.hiddenPosts = [];
+        
         getAllRecentPosts();
         
         // Invoke getAndHideRecentPosts() every minute
         $interval(function() {
-            getAndHideRecentPosts();
+            checkForNewPosts();
         }, 60000);
     }
     
@@ -208,8 +185,8 @@ angular.module ("app.services", [])
         addPost: addPost,
         getFeed: getFeed,
         getOldPosts: getOldPosts,
-        showHiddenPosts: showHiddenPosts,
-        hasHiddenPosts: hasHiddenPosts,
+        getAllRecentPosts: getAllRecentPosts,
+        hasNewPosts: hasNewPosts,
         reset: reset
     }
 })

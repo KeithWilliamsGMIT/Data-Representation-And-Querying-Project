@@ -65,6 +65,10 @@ The following two git repositories were very helpful when deciding how to struct
 + [angular-flask](https://github.com/shea256/angular-flask)
 + [neo4j-flask](https://github.com/nicolewhite/neo4j-flask)
 
+##### Known Bugs
++ Only the 20 most recent posts will be loaded after writing a new post or pressing the load button.
++ The current user appears in the followers and following list in other users profile's with a follow option.
+
 #### Deployment Stage
 The deployment steps for this project were tested on Linux-based operating systems.
 
