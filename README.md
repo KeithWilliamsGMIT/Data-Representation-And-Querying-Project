@@ -66,7 +66,9 @@ The following two git repositories were very helpful when deciding how to struct
 + [neo4j-flask](https://github.com/nicolewhite/neo4j-flask)
 
 ##### Known Bugs
-+ Only the 20 most recent posts will be loaded after writing a new post or pressing the load button.
++ Only the twenty most recent posts will be loaded after writing a new post or pressing the load button. This is due to a hardcoded limit in value in a query.
++ Sometimes get duplicates in the feed.
++ The users widget does not seperate users into rows wich causes them to misalign when the web console is opened in the browser.
 + The current user appears in the followers and following list in other users profile's with a follow option.
 
 #### Deployment Stage
@@ -145,4 +147,4 @@ I would spend more time upfront researching different technologies before starti
 
 I would also involve git and GitHub more throughout the project. I would commit the project more frequently and also make use of GitHub's features such as issues, labels and milestones. However, I feel that this was not a major issue as I was not working on this project as part of a team and it was relatively easy to manage the it without these tools.
 
-I feel that more planning was required before starting the development. I also think the scope of this project was quite large and may have been better off choosing a smaller project. Overall, I found this project to be an excellent learning experience and have achieved my initial goals.
+I feel that more planning was required before starting the development. I also think the scope of this project was quite large and may have been better off choosing a smaller project. Overall, I found this project to be challenging but also an excellent learning experience, and have achieved my initial goals.

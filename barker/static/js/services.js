@@ -143,7 +143,7 @@ angular.module ("app.services", [])
         }
     }
     
-    // Add the posts to the beginning of the list if the request was successful
+    // Get recent posts and call the callback
     function getRecentPosts(callback) {
         var timestamp = 0;
         
@@ -175,7 +175,7 @@ angular.module ("app.services", [])
         
         getAllRecentPosts();
         
-        // Invoke getAndHideRecentPosts() every minute
+        // Invoke checkForNewPosts() every minute
         $interval(function() {
             checkForNewPosts();
         }, 60000);
